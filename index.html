@@ -160,6 +160,64 @@
             gap: 6px;
             margin-top: 8px;
         }
+        /* Modal stilleri */
+#oyunModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+#oyunModal.active {
+    display: flex;
+}
+#oyunModal .modal-box {
+    background: #1a1a2e;
+    max-width: 700px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 16px;
+    padding: 30px;
+    position: relative;
+    color: #eee;
+}
+#oyunModal .modal-box img {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+#oyunModal .modal-box .detay {
+    margin: 6px 0;
+    color: #aaa;
+    font-size: 14px;
+}
+#oyunModal .modal-box .detay span {
+    color: #eee;
+    font-weight: bold;
+}
+#oyunModal .modal-box .tur-etiketi {
+    background: #6c5ce7;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: white;
+    display: inline-block;
+    margin: 4px 4px 4px 0;
+}
+#oyunModal .modal-box .aksiyon-butonlari {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
     </style>
 </head>
 <body>
