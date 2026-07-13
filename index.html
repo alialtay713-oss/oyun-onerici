@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🎮 Oyun Önerici</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    <!-- Supabase CDN'i güncel ve doğru sürüm -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
     </script>
     <style>
         * {
@@ -132,6 +133,9 @@
         .basari-mesaji {
             color: #00b894;
         }
+        .yukleniyor {
+            color: #fdcb6e;
+        }
     </style>
 </head>
 <body>
@@ -168,11 +172,20 @@
 
     <script>
         // ============================================================
-        // 1️⃣ TEK BİR SUPABASE BAĞLANTISI - BAŞKA YOK!
+        // 1️⃣ SUPABASE BAĞLANTISI - KONTROLLÜ OLUŞTUR
         // ============================================================
         const SUPABASE_URL = "https://erlkkobrxrmdmcihzqjz.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
-        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // supabase nesnesinin doğru oluştuğunu kontrol et
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase bağlantısı başarılı!', supabase);
+        } catch (error) {
+            console.error('❌ Supabase bağlantı hatası:', error);
+            alert('Supabase bağlanamadı! Lütfen sayfayı yenileyin.');
+        }
 
         // ============================================================
         // 2️⃣ KULLANICI ID
@@ -182,29 +195,49 @@
             kullaniciId = 'user_' + Math.random().toString(36).slice(2, 10);
             localStorage.setItem('kullaniciId', kullaniciId);
         }
+        console.log('👤 Kullanıcı ID:', kullaniciId);
 
         // ============================================================
         // 3️⃣ VERİTABANI FONKSİYONLARI
         // ============================================================
         async function oyunlariGetir() {
-            const { data, error } = await db.from('oyunlar').select('*');
-            if (error) {
-                console.error('Veri çekme hatası:', error);
+            if (!supabase) {
+                console.error('❌ Supabase bağlı değil!');
                 return [];
             }
-            return data || [];
+            try {
+                const { data, error } = await supabase.from('oyunlar').select('*');
+                if (error) {
+                    console.error('❌ Veri çekme hatası:', error);
+                    return [];
+                }
+                console.log('📦 Oyunlar yüklendi:', data?.length || 0, 'adet');
+                return data || [];
+            } catch (err) {
+                console.error('❌ Beklenmeyen hata:', err);
+                return [];
+            }
         }
 
         async function oynananlariGetir() {
-            const { data, error } = await supabase
-                .from('oynananlar')
-                .select('oyun_id')
-                .eq('kullanici_id', kullaniciId);
-            if (error) {
-                console.error('Oynananlar hatası:', error);
+            if (!supabase) {
+                console.error('❌ Supabase bağlı değil!');
                 return [];
             }
-            return data.map(item => item.oyun_id);
+            try {
+                const { data, error } = await supabase
+                    .from('oynananlar')
+                    .select('oyun_id')
+                    .eq('kullanici_id', kullaniciId);
+                if (error) {
+                    console.error('❌ Oynananlar hatası:', error);
+                    return [];
+                }
+                return data.map(item => item.oyun_id);
+            } catch (err) {
+                console.error('❌ Beklenmeyen hata:', err);
+                return [];
+            }
         }
 
         // ============================================================
@@ -212,11 +245,16 @@
         // ============================================================
         async function rastgeleOner() {
             const sonucDiv = document.getElementById('sonuc');
-            sonucDiv.innerHTML = '<p>🔄 Oyun aranıyor...</p>';
+            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Oyun aranıyor...</p>';
+
+            if (!supabase) {
+                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Supabase bağlantısı yok!</p>';
+                return;
+            }
 
             const butunOyunlar = await oyunlariGetir();
             if (butunOyunlar.length === 0) {
-                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Veritabanında oyun yok!</p>';
+                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Veritabanında oyun yok! Lütfen önce oyun ekleyin.</p>';
                 return;
             }
 
@@ -224,7 +262,7 @@
             const filtrelenmis = butunOyunlar.filter(o => !oynananlar.includes(o.id));
 
             if (filtrelenmis.length === 0) {
-                sonucDiv.innerHTML = '<p class="basari-mesaji">🎉 Tüm oyunları oynadın!</p>';
+                sonucDiv.innerHTML = '<p class="basari-mesaji">🎉 Tüm oyunları oynadın! Yeni oyunlar eklemeyi dene.</p>';
                 return;
             }
 
@@ -248,16 +286,22 @@
         }
 
         async function oynadimEkle(oyunId) {
+            if (!supabase) {
+                alert('❌ Supabase bağlantısı yok!');
+                return;
+            }
+
             const { error } = await supabase
                 .from('oynananlar')
                 .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
 
             if (error) {
                 alert('❌ Hata: ' + error.message);
+                console.error('❌ Ekleme hatası:', error);
                 return;
             }
 
-            document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Listene eklendi!</p>';
+            document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! Başka bir oyun önereyim mi? 🎲</p>';
             oynananListesiniGuncelle();
         }
 
@@ -278,7 +322,12 @@
 
         async function filtrele(tur) {
             const sonucDiv = document.getElementById('sonuc');
-            sonucDiv.innerHTML = '<p>🔄 Filtreleniyor...</p>';
+            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Filtreleniyor...</p>';
+
+            if (!supabase) {
+                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Supabase bağlantısı yok!</p>';
+                return;
+            }
 
             const butunOyunlar = await oyunlariGetir();
             const oynananlar = await oynananlariGetir();
@@ -291,7 +340,7 @@
             }
 
             if (filtrelenmis.length === 0) {
-                sonucDiv.innerHTML = `<p class="basari-mesaji">🎉 Bu türde oyun kalmadı!</p>`;
+                sonucDiv.innerHTML = `<p class="basari-mesaji">🎉 Bu türde oynanmamış oyun kalmadı!</p>`;
                 return;
             }
 
@@ -317,7 +366,14 @@
         // 5️⃣ SAYFA YÜKLENİNCE
         // ============================================================
         window.onload = function() {
-            oynananListesiniGuncelle();
+            console.log('🚀 Sayfa yüklendi!');
+            if (supabase) {
+                oynananListesiniGuncelle();
+            } else {
+                document.getElementById('oynananListesi').innerHTML =
+                    '<span style="color:#ff6b6b;">❌ Supabase bağlantısı kurulamadı!</span>';
+            }
+
             document.getElementById('rastgeleBtn').addEventListener('click', rastgeleOner);
 
             document.querySelectorAll('.filtre-btn').forEach(btn => {
