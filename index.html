@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🎮 Oyun Önerici</title>
-    <!-- Supabase CDN'i güncel ve doğru sürüm -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
     </script>
     <style>
@@ -15,7 +14,7 @@
         }
         body {
             font-family: system-ui, sans-serif;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 30px auto;
             padding: 20px;
             background: #0f0f1a;
@@ -29,6 +28,7 @@
         }
         h1 {
             margin-bottom: 20px;
+            font-size: 28px;
         }
         button {
             background: #6c5ce7;
@@ -59,25 +59,45 @@
             border-radius: 12px;
             margin: 16px 0;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+        }
+        .oyun-resim {
+            width: 200px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #2d2d4a;
+        }
+        .oyun-bilgi {
+            flex: 1;
+            min-width: 200px;
         }
         .oyun-bilgi h3 {
             margin: 0;
             color: #fff;
+            font-size: 20px;
         }
         .oyun-bilgi p {
-            margin: 6px 0 0;
+            margin: 6px 0;
             color: #aaa;
+            font-size: 14px;
+        }
+        .detay-etiketi {
+            background: #2d2d4a;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #c7c7e6;
+            display: inline-block;
+            margin: 3px 4px 3px 0;
         }
         .tur-etiketi {
-            background: #3d3d5c;
+            background: #6c5ce7;
             padding: 4px 14px;
             border-radius: 20px;
-            font-size: 14px;
-            color: #c7c7e6;
+            font-size: 13px;
+            color: white;
             display: inline-block;
             margin-top: 6px;
         }
@@ -89,6 +109,7 @@
             color: white;
             cursor: pointer;
             font-size: 14px;
+            margin-top: 10px;
         }
         .oynadim-btn:hover {
             background: #00a381;
@@ -96,9 +117,6 @@
         #sonuc {
             min-height: 100px;
             margin-top: 20px;
-        }
-        #sonuc p {
-            color: #888;
         }
         #oynananlar {
             margin-top: 30px;
@@ -136,6 +154,12 @@
         .yukleniyor {
             color: #fdcb6e;
         }
+        .oyun-detaylari {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -145,19 +169,20 @@
 
         <div>
             <button id="rastgeleBtn">🎲 Bana Oyun Öner</button>
+            <button id="yenileBtn" style="background:#2d2d4a;">🔄 Oyunları Yenile</button>
         </div>
 
         <div class="filtreler">
             <span>Tür:</span>
             <button class="filtre-btn" data-tur="Tüm Türler">Tümü</button>
-            <button class="filtre-btn" data-tur="Aksiyon">Aksiyon</button>
-            <button class="filtre-btn" data-tur="Macera">Macera</button>
-            <button class="filtre-btn" data-tur="RPG">RPG</button>
-            <button class="filtre-btn" data-tur="Strateji">Strateji</button>
-            <button class="filtre-btn" data-tur="Simülasyon">Simülasyon</button>
-            <button class="filtre-btn" data-tur="Platform">Platform</button>
-            <button class="filtre-btn" data-tur="Bulmaca">Bulmaca</button>
-            <button class="filtre-btn" data-tur="Sosyal">Sosyal</button>
+            <button class="filtre-btn" data-tur="action">Aksiyon</button>
+            <button class="filtre-btn" data-tur="adventure">Macera</button>
+            <button class="filtre-btn" data-tur="rpg">RPG</button>
+            <button class="filtre-btn" data-tur="strategy">Strateji</button>
+            <button class="filtre-btn" data-tur="simulation">Simülasyon</button>
+            <button class="filtre-btn" data-tur="platformer">Platform</button>
+            <button class="filtre-btn" data-tur="puzzle">Bulmaca</button>
+            <button class="filtre-btn" data-tur="shooter">Nişancı</button>
         </div>
 
         <div id="sonuc">
@@ -172,97 +197,114 @@
 
     <script>
         // ============================================================
-        // 1️⃣ SUPABASE BAĞLANTISI - KONTROLLÜ OLUŞTUR
+        // 1️⃣ SUPABASE BAĞLANTISI
         // ============================================================
         const SUPABASE_URL = "https://erlkkobrxrmdmcihzqjz.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
-
-        // supabase nesnesinin doğru oluştuğunu kontrol et
-        let supabase;
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase bağlantısı başarılı!', supabase);
-        } catch (error) {
-            console.error('❌ Supabase bağlantı hatası:', error);
-            alert('Supabase bağlanamadı! Lütfen sayfayı yenileyin.');
-        }
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ============================================================
-        // 2️⃣ KULLANICI ID
+        // 2️⃣ RAWG API ANAHTARI (BURAYA KENDİ ANAHTARINI YAZ!)
+        // ============================================================
+        const RAWG_API_KEY = "a432df797ae84cafab5abae0c270d5c4"; // <--- BURAYI DEĞİŞTİR!
+
+        // ============================================================
+        // 3️⃣ KULLANICI ID
         // ============================================================
         let kullaniciId = localStorage.getItem('kullaniciId');
         if (!kullaniciId) {
             kullaniciId = 'user_' + Math.random().toString(36).slice(2, 10);
             localStorage.setItem('kullaniciId', kullaniciId);
         }
-        console.log('👤 Kullanıcı ID:', kullaniciId);
 
         // ============================================================
-        // 3️⃣ VERİTABANI FONKSİYONLARI
+        // 4️⃣ OYUNLARI API'DEN ÇEK
         // ============================================================
         async function oyunlariGetir() {
-            if (!supabase) {
-                console.error('❌ Supabase bağlı değil!');
-                return [];
-            }
+            const url =
+                `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&ordering=-rating&page_size=50&exclude_additions=true`;
+
             try {
-                const { data, error } = await supabase.from('oyunlar').select('*');
-                if (error) {
-                    console.error('❌ Veri çekme hatası:', error);
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (!data.results) {
+                    console.error('API\'den veri gelmedi:', data);
                     return [];
                 }
-                console.log('📦 Oyunlar yüklendi:', data?.length || 0, 'adet');
-                return data || [];
-            } catch (err) {
-                console.error('❌ Beklenmeyen hata:', err);
+
+                return data.results.map(game => ({
+                    id: game.id,
+                    isim: game.name,
+                    tur: game.genres?.map(g => g.name).join(', ') || 'Bilinmiyor',
+                    tur_slug: game.genres?.map(g => g.slug).join(', ') || '',
+                    aciklama: game.description_raw || 'Açıklama yok',
+                    resim_url: game.background_image || '',
+                    cikis_yili: game.released ? game.released.split('-')[0] : 'Bilinmiyor',
+                    gelistirici: game.developers?.map(d => d.name).join(', ') || 'Bilinmiyor',
+                    puan: game.rating ? game.rating.toFixed(1) : '?',
+                    metacritic: game.metacritic || '?',
+                    platformlar: game.platforms?.map(p => p.platform.name).slice(0, 3).join(', ') || 'Bilinmiyor',
+                    web_sitesi: game.website || ''
+                }));
+
+            } catch (error) {
+                console.error('API çağrısı başarısız:', error);
                 return [];
             }
         }
 
+        // ============================================================
+        // 5️⃣ VERİTABANI FONKSİYONLARI
+        // ============================================================
         async function oynananlariGetir() {
-            if (!supabase) {
-                console.error('❌ Supabase bağlı değil!');
+            const { data, error } = await supabase
+                .from('oynananlar')
+                .select('oyun_id')
+                .eq('kullanici_id', kullaniciId);
+            if (error) {
+                console.error('Oynananlar hatası:', error);
                 return [];
             }
-            try {
-                const { data, error } = await supabase
-                    .from('oynananlar')
-                    .select('oyun_id')
-                    .eq('kullanici_id', kullaniciId);
-                if (error) {
-                    console.error('❌ Oynananlar hatası:', error);
-                    return [];
-                }
-                return data.map(item => item.oyun_id);
-            } catch (err) {
-                console.error('❌ Beklenmeyen hata:', err);
-                return [];
-            }
+            return data.map(item => item.oyun_id);
         }
 
         // ============================================================
-        // 4️⃣ ANA FONKSİYONLAR
+        // 6️⃣ ANA FONKSİYONLAR
         // ============================================================
+        let tumOyunlar = [];
+
+        async function oyunlariYenile() {
+            const sonucDiv = document.getElementById('sonuc');
+            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 API\'den oyunlar yükleniyor...</p>';
+
+            tumOyunlar = await oyunlariGetir();
+
+            if (tumOyunlar.length === 0) {
+                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ API\'den oyun gelmedi! Anahtarını kontrol et.</p>';
+                return;
+            }
+
+            // Veritabanına kaydet (isteğe bağlı, şimdilik sadece göster)
+            sonucDiv.innerHTML = `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi! Şimdi öneri alabilirsin.</p>`;
+            console.log('📦 Yüklenen oyunlar:', tumOyunlar);
+        }
+
         async function rastgeleOner() {
             const sonucDiv = document.getElementById('sonuc');
+
+            if (tumOyunlar.length === 0) {
+                await oyunlariYenile();
+                if (tumOyunlar.length === 0) return;
+            }
+
             sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Oyun aranıyor...</p>';
 
-            if (!supabase) {
-                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Supabase bağlantısı yok!</p>';
-                return;
-            }
-
-            const butunOyunlar = await oyunlariGetir();
-            if (butunOyunlar.length === 0) {
-                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Veritabanında oyun yok! Lütfen önce oyun ekleyin.</p>';
-                return;
-            }
-
             const oynananlar = await oynananlariGetir();
-            const filtrelenmis = butunOyunlar.filter(o => !oynananlar.includes(o.id));
+            const filtrelenmis = tumOyunlar.filter(o => !oynananlar.includes(o.id));
 
             if (filtrelenmis.length === 0) {
-                sonucDiv.innerHTML = '<p class="basari-mesaji">🎉 Tüm oyunları oynadın! Yeni oyunlar eklemeyi dene.</p>';
+                sonucDiv.innerHTML = '<p class="basari-mesaji">🎉 Tüm oyunları oynadın! Yeni oyunlar yükle.</p>';
                 return;
             }
 
@@ -271,44 +313,50 @@
         }
 
         function oyunGoster(oyun) {
+            const resimHtml = oyun.resim_url ?
+                `<img src="${oyun.resim_url}" alt="${oyun.isim}" class="oyun-resim" />` :
+                `<div class="oyun-resim" style="display:flex;align-items:center;justify-content:center;color:#888;">📷 Yok</div>`;
+
             document.getElementById('sonuc').innerHTML = `
                     <div class="oyun-karti">
+                        ${resimHtml}
                         <div class="oyun-bilgi">
                             <h3>${oyun.isim}</h3>
-                            <p>${oyun.aciklama || 'Açıklama yok'}</p>
-                            <span class="tur-etiketi">${oyun.tur || 'Türsüz'}</span>
-                        </div>
-                        <div>
-                            <button class="oynadim-btn" onclick="oynadimEkle(${oyun.id})">✅ Oynadım</button>
+                            <div class="oyun-detaylari">
+                                <span class="detay-etiketi">📅 ${oyun.cikis_yili}</span>
+                                <span class="detay-etiketi">⭐ ${oyun.puan}</span>
+                                <span class="detay-etiketi">🎯 Metacritic: ${oyun.metacritic}</span>
+                                <span class="detay-etiketi">🛠️ ${oyun.gelistirici}</span>
+                                <span class="detay-etiketi">📱 ${oyun.platformlar}</span>
+                            </div>
+                            <p>${oyun.aciklama ? oyun.aciklama.substring(0, 250) + '...' : 'Açıklama yok'}</p>
+                            <span class="tur-etiketi">🎮 ${oyun.tur}</span>
+                            <div>
+                                <button class="oynadim-btn" onclick="oynadimEkle(${oyun.id})">✅ Oynadım</button>
+                                ${oyun.web_sitesi ? `<a href="${oyun.web_sitesi}" target="_blank" style="color:#6c5ce7;margin-left:12px;font-size:14px;">🔗 Web Sitesi</a>` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
         }
 
         async function oynadimEkle(oyunId) {
-            if (!supabase) {
-                alert('❌ Supabase bağlantısı yok!');
-                return;
-            }
-
             const { error } = await supabase
                 .from('oynananlar')
                 .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
 
             if (error) {
                 alert('❌ Hata: ' + error.message);
-                console.error('❌ Ekleme hatası:', error);
                 return;
             }
 
-            document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! Başka bir oyun önereyim mi? 🎲</p>';
+            document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! 🎲</p>';
             oynananListesiniGuncelle();
         }
 
         async function oynananListesiniGuncelle() {
             const oynananlar = await oynananlariGetir();
-            const butunOyunlar = await oyunlariGetir();
-            const isimler = butunOyunlar
+            const isimler = tumOyunlar
                 .filter(o => oynananlar.includes(o.id))
                 .map(o => o.isim);
 
@@ -322,21 +370,23 @@
 
         async function filtrele(tur) {
             const sonucDiv = document.getElementById('sonuc');
-            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Filtreleniyor...</p>';
 
-            if (!supabase) {
-                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Supabase bağlantısı yok!</p>';
-                return;
+            if (tumOyunlar.length === 0) {
+                await oyunlariYenile();
+                if (tumOyunlar.length === 0) return;
             }
 
-            const butunOyunlar = await oyunlariGetir();
+            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Filtreleniyor...</p>';
+
             const oynananlar = await oynananlariGetir();
 
             let filtrelenmis;
             if (tur === 'Tüm Türler') {
-                filtrelenmis = butunOyunlar.filter(o => !oynananlar.includes(o.id));
+                filtrelenmis = tumOyunlar.filter(o => !oynananlar.includes(o.id));
             } else {
-                filtrelenmis = butunOyunlar.filter(o => o.tur === tur && !oynananlar.includes(o.id));
+                filtrelenmis = tumOyunlar.filter(o =>
+                    o.tur_slug.includes(tur) && !oynananlar.includes(o.id)
+                );
             }
 
             if (filtrelenmis.length === 0) {
@@ -345,16 +395,24 @@
             }
 
             let html = '';
-            filtrelenmis.slice(0, 8).forEach(o => {
+            filtrelenmis.slice(0, 6).forEach(o => {
+                const resimHtml = o.resim_url ?
+                    `<img src="${o.resim_url}" alt="${o.isim}" style="width:150px;height:90px;object-fit:cover;border-radius:8px;background:#2d2d4a;" />` :
+                    '';
                 html += `
-                        <div class="oyun-karti">
+                        <div class="oyun-karti" style="gap:12px;">
+                            ${resimHtml}
                             <div class="oyun-bilgi">
-                                <h3>${o.isim}</h3>
-                                <p>${o.aciklama || ''}</p>
-                                <span class="tur-etiketi">${o.tur || 'Türsüz'}</span>
-                            </div>
-                            <div>
-                                <button class="oynadim-btn" onclick="oynadimEkle(${o.id})">✅ Oynadım</button>
+                                <h3 style="font-size:18px;">${o.isim}</h3>
+                                <div class="oyun-detaylari">
+                                    <span class="detay-etiketi">📅 ${o.cikis_yili}</span>
+                                    <span class="detay-etiketi">⭐ ${o.puan}</span>
+                                    <span class="detay-etiketi">${o.gelistirici}</span>
+                                </div>
+                                <span class="tur-etiketi">${o.tur}</span>
+                                <div>
+                                    <button class="oynadim-btn" onclick="oynadimEkle(${o.id})">✅ Oynadım</button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -363,32 +421,31 @@
         }
 
         // ============================================================
-        // 5️⃣ SAYFA YÜKLENİNCE
+        // 7️⃣ SAYFA YÜKLENİNCE
         // ============================================================
         window.onload = function() {
             console.log('🚀 Sayfa yüklendi!');
-            if (supabase) {
-                oynananListesiniGuncelle();
-            } else {
-                document.getElementById('oynananListesi').innerHTML =
-                    '<span style="color:#ff6b6b;">❌ Supabase bağlantısı kurulamadı!</span>';
-            }
-
             document.getElementById('rastgeleBtn').addEventListener('click', rastgeleOner);
+            document.getElementById('yenileBtn').addEventListener('click', oyunlariYenile);
 
             document.querySelectorAll('.filtre-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     filtrele(this.dataset.tur);
                 });
             });
+
+            // Sayfa açılır açılmaz oyunları yükle
+            oyunlariYenile();
+            oynananListesiniGuncelle();
         };
 
         // ============================================================
-        // 6️⃣ GLOBAL (HTML'den çağrılmak için)
+        // 8️⃣ GLOBAL
         // ============================================================
         window.rastgeleOner = rastgeleOner;
         window.filtrele = filtrele;
         window.oynadimEkle = oynadimEkle;
+        window.oyunlariYenile = oyunlariYenile;
     </script>
 
 </body>
