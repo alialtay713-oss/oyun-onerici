@@ -1,248 +1,207 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oyun Önerici</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#111827;
-color:white;
-}
-
-.container{
-max-width:900px;
-margin:auto;
-padding:30px;
-}
-
-h1{
-text-align:center;
-}
-
-button{
-cursor:pointer;
-padding:10px 18px;
-border:none;
-border-radius:8px;
-background:#2563eb;
-color:white;
-font-size:15px;
-}
-
-button:hover{
-background:#1d4ed8;
-}
-
-select{
-padding:10px;
-border-radius:8px;
-font-size:15px;
-margin-left:10px;
-}
-
-.controls{
-display:flex;
-justify-content:center;
-gap:15px;
-margin:30px 0;
-flex-wrap:wrap;
-}
-
-#randomGame{
-background:#1f2937;
-padding:20px;
-border-radius:10px;
-margin-bottom:30px;
-text-align:center;
-font-size:22px;
-}
-
-.card{
-background:#1f2937;
-padding:15px;
-border-radius:10px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:10px;
-}
-
-.genre{
-opacity:.6;
-font-size:14px;
-}
-
-.empty{
-text-align:center;
-opacity:.6;
-margin-top:30px;
-}
-</style>
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎮 Oyun Önerici</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #0f0f1a; color: #eee; }
+        .container { background: #1a1a2e; padding: 30px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
+        button { background: #6c5ce7; color: white; border: none; padding: 12px 28px; border-radius: 30px; font-size: 16px; cursor: pointer; margin: 6px; }
+        button:hover { background: #5a4bd1; }
+        .oyun-karti { background: #252541; padding: 20px; border-radius: 12px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center; }
+        .oyun-bilgi h3 { margin: 0; color: #fff; }
+        .oyun-bilgi p { margin: 6px 0 0; color: #aaa; }
+        .tur-etiketi { background: #3d3d5c; padding: 4px 14px; border-radius: 20px; font-size: 14px; color: #c7c7e6; }
+        .oynadim-btn { background: #00b894; padding: 6px 18px; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .oynadim-btn:hover { background: #00a381; }
+        #sonuc { min-height: 100px; margin-top: 20px; }
+        #oynananlar { margin-top: 30px; }
+        #oynananlar span { background: #2d2d4a; padding: 4px 14px; border-radius: 16px; margin: 4px; display: inline-block; font-size: 14px; }
+        .filtreler { margin: 16px 0; }
+    </style>
 </head>
 <body>
 
 <div class="container">
+    <h1>🎮 Oyun Önerici</h1>
 
-<h1>🎮 Oyun Önerici</h1>
+    <div>
+        <button onclick="rastgeleOner()">🎲 Bana Oyun Öner</button>
+    </div>
 
-<div class="controls">
+    <div class="filtreler">
+        <span>Tür:</span>
+        <button onclick="filtrele('Tüm Türler')">Tümü</button>
+        <button onclick="filtrele('Aksiyon')">Aksiyon</button>
+        <button onclick="filtrele('Macera')">Macera</button>
+        <button onclick="filtrele('RPG')">RPG</button>
+        <button onclick="filtrele('Strateji')">Strateji</button>
+        <button onclick="filtrele('Simülasyon')">Simülasyon</button>
+    </div>
 
-<button onclick="suggestRandom()">
-Bana Oyun Öner
-</button>
+    <div id="sonuc">
+        <p style="color: #888;">Henüz öneri yok.</p>
+    </div>
 
-<select id="genre" onchange="loadGames()">
-<option value="">Tüm Türler</option>
-<option>Aksiyon</option>
-<option>Macera</option>
-<option>RPG</option>
-<option>FPS</option>
-<option>Strateji</option>
-<option>Simülasyon</option>
-<option>Yarış</option>
-<option>Korku</option>
-</select>
-
-</div>
-
-<div id="randomGame">
-Henüz öneri yok.
-</div>
-
-<div id="games"></div>
-
+    <div id="oynananlar">
+        <h3>✅ Oynadıklarım</h3>
+        <div id="oynananListesi"></div>
+    </div>
 </div>
 
 <script>
+    // ⚡ SUPABASE BAĞLANTISI (SADECE BURADA TANIMLI)
+    const SUPABASE_URL = "https://erlkkobrxrmdmcihzqjz.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
 
-const SUPABASE_URL="https://erlkkobrxrmdmcihzqjz.supabase.co";
-const SUPABASE_ANONKEY="sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const supabase = window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+    let kullaniciId = localStorage.getItem('kullaniciId');
+    if (!kullaniciId) {
+        kullaniciId = 'user_' + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem('kullaniciId', kullaniciId);
+    }
 
-let userId=localStorage.getItem("user_id");
+    let mevcutOyunlar = [];
+    let oynananOyunIds = [];
 
-if(!userId){
-userId=crypto.randomUUID();
-localStorage.setItem("user_id",userId);
-}
+    // 📥 Oyunları getir
+    async function oyunlariGetir() {
+        const { data, error } = await supabase.from('oyunlar').select('*');
+        if (error) {
+            console.error('Veri çekme hatası:', error);
+            return [];
+        }
+        return data || [];
+    }
 
-let allGames=[];
-let played=[];
+    // 👤 Kullanıcının oynadığı oyunları getir
+    async function oynananlariGetir() {
+        const { data, error } = await supabase
+            .from('oynananlar')
+            .select('oyun_id')
+            .eq('kullanici_id', kullaniciId);
+        if (error) {
+            console.error('Oynananlar hatası:', error);
+            return [];
+        }
+        return data.map(item => item.oyun_id);
+    }
 
-async function loadPlayed(){
+    // 🎲 Rastgele oyun öner
+    async function rastgeleOner() {
+        const butunOyunlar = await oyunlariGetir();
+        if (butunOyunlar.length === 0) {
+            document.getElementById('sonuc').innerHTML = '<p style="color: #ff6b6b;">Veritabanında oyun yok! Lütfen önce oyun ekleyin.</p>';
+            return;
+        }
 
-const {data}=await supabase
-.from("played_games")
-.select("game_id")
-.eq("user_id",userId);
+        oynananOyunIds = await oynananlariGetir();
+        const filtrelenmis = butunOyunlar.filter(o => !oynananOyunIds.includes(o.id));
 
-played=data.map(x=>x.game_id);
+        if (filtrelenmis.length === 0) {
+            document.getElementById('sonuc').innerHTML = '<p style="color: #fdcb6e;">🎉 Tüm oyunları oynamışsın! Yeni oyunlar eklemeyi dene.</p>';
+            return;
+        }
 
-}
+        const rastgele = filtrelenmis[Math.floor(Math.random() * filtrelenmis.length)];
+        oyunGoster(rastgele);
+    }
 
-async function loadGames(){
+    // 📋 Oyunu göster
+    function oyunGoster(oyun) {
+        document.getElementById('sonuc').innerHTML = `
+            <div class="oyun-karti">
+                <div class="oyun-bilgi">
+                    <h3>${oyun.isim}</h3>
+                    <p>${oyun.aciklama || 'Açıklama yok'}</p>
+                    <span class="tur-etiketi">${oyun.tur}</span>
+                </div>
+                <div>
+                    <button class="oynadim-btn" onclick="oynadimEkle(${oyun.id})">✅ Oynadım</button>
+                </div>
+            </div>
+        `;
+    }
 
-await loadPlayed();
+    // ✅ Oynadım ekle
+    async function oynadimEkle(oyunId) {
+        const { error } = await supabase
+            .from('oynananlar')
+            .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
 
-let query=supabase
-.from("games")
-.select("*");
+        if (error) {
+            alert('Bir hata oluştu: ' + error.message);
+            return;
+        }
 
-const genre=document.getElementById("genre").value;
+        oynananOyunIds.push(oyunId);
+        oynananListesiniGuncelle();
+        document.getElementById('sonuc').innerHTML = '<p style="color: #00b894;">✅ Oyun listene eklendi! Başka bir oyun önereyim mi? 🎲</p>';
+    }
 
-if(genre!="")
-query=query.eq("genre",genre);
+    // 🔄 Oynanan listesini güncelle
+    async function oynananListesiniGuncelle() {
+        const oynananlar = await oynananlariGetir();
+        const butunOyunlar = await oyunlariGetir();
+        const isimler = butunOyunlar
+            .filter(o => oynananlar.includes(o.id))
+            .map(o => o.isim);
 
-const {data}=await query;
+        const container = document.getElementById('oynananListesi');
+        if (isimler.length === 0) {
+            container.innerHTML = '<span style="color: #888;">Henüz oyun oynamadın.</span>';
+        } else {
+            container.innerHTML = isimler.map(isim => `<span>${isim}</span>`).join('');
+        }
+    }
 
-allGames=data.filter(g=>!played.includes(g.id));
+    // 🔍 Filtrele
+    async function filtrele(tur) {
+        const butunOyunlar = await oyunlariGetir();
+        oynananOyunIds = await oynananlariGetir();
 
-renderGames();
+        let filtrelenmis;
+        if (tur === 'Tüm Türler') {
+            filtrelenmis = butunOyunlar.filter(o => !oynananOyunIds.includes(o.id));
+        } else {
+            filtrelenmis = butunOyunlar.filter(o => o.tur === tur && !oynananOyunIds.includes(o.id));
+        }
 
-}
+        if (filtrelenmis.length === 0) {
+            document.getElementById('sonuc').innerHTML = `<p style="color: #fdcb6e;">Bu türde oynanmamış oyun kalmadı! 🎉</p>`;
+            return;
+        }
 
-function renderGames(){
+        let html = '';
+        filtrelenmis.slice(0, 6).forEach(o => {
+            html += `
+                <div class="oyun-karti">
+                    <div class="oyun-bilgi">
+                        <h3>${o.isim}</h3>
+                        <p>${o.aciklama || ''}</p>
+                        <span class="tur-etiketi">${o.tur}</span>
+                    </div>
+                    <div>
+                        <button class="oynadim-btn" onclick="oynadimEkle(${o.id})">✅ Oynadım</button>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('sonuc').innerHTML = html;
+    }
 
-const div=document.getElementById("games");
+    // 🚀 Sayfa açıldığında çalıştır
+    window.onload = function() {
+        oynananListesiniGuncelle();
+    };
 
-if(allGames.length==0){
-
-div.innerHTML="<div class='empty'>Gösterilecek oyun kalmadı.</div>";
-return;
-
-}
-
-div.innerHTML="";
-
-allGames.forEach(game=>{
-
-div.innerHTML+=`
-<div class="card">
-
-<div>
-<div><b>${game.title}</b></div>
-<div class="genre">${game.genre}</div>
-</div>
-
-<button onclick="playedGame(${game.id})">
-Oynadım
-</button>
-
-</div>
-`;
-
-});
-
-}
-
-async function playedGame(id){
-
-await supabase
-.from("played_games")
-.insert({
-user_id:userId,
-game_id:id
-});
-
-await loadGames();
-
-}
-
-function suggestRandom(){
-
-if(allGames.length==0){
-
-document.getElementById("randomGame").innerHTML=
-"Önerilecek oyun kalmadı.";
-
-return;
-
-}
-
-const random=allGames[Math.floor(Math.random()*allGames.length)];
-
-document.getElementById("randomGame").innerHTML=
-`
-🎲<br><br>
-<b>${random.title}</b><br>
-<small>${random.genre}</small>
-`;
-
-}
-
-loadGames();
-
+    // Hata ayıklama için global yap
+    window.rastgeleOner = rastgeleOner;
+    window.filtrele = filtrele;
+    window.oynadimEkle = oynadimEkle;
 </script>
 
 </body>
