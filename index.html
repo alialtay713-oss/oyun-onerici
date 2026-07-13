@@ -450,4 +450,17 @@
     </script>
 
 </body>
+    <!-- ========== MODAL ========== -->
+<div id="oyunModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#1a1a2e; max-width:700px; width:90%; max-height:90vh; overflow-y:auto; border-radius:16px; padding:30px; position:relative; color:#eee;">
+        
+        <!-- Kapatma Butonu -->
+        <button onclick="modalKapat()" style="position:absolute; top:10px; right:20px; background:transparent; border:none; color:#fff; font-size:30px; cursor:pointer;">&times;</button>
+        
+        <!-- Modal İçeriği -->
+        <div id="modalIcerik">
+            <!-- Buraya JavaScript ile oyun bilgileri gelecek -->
+        </div>
+    </div>
+</div>
 </html>
