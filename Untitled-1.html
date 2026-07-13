@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oyun Önerici</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#111827;
+color:white;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+padding:30px;
+}
+
+h1{
+text-align:center;
+}
+
+button{
+cursor:pointer;
+padding:10px 18px;
+border:none;
+border-radius:8px;
+background:#2563eb;
+color:white;
+font-size:15px;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+select{
+padding:10px;
+border-radius:8px;
+font-size:15px;
+margin-left:10px;
+}
+
+.controls{
+display:flex;
+justify-content:center;
+gap:15px;
+margin:30px 0;
+flex-wrap:wrap;
+}
+
+#randomGame{
+background:#1f2937;
+padding:20px;
+border-radius:10px;
+margin-bottom:30px;
+text-align:center;
+font-size:22px;
+}
+
+.card{
+background:#1f2937;
+padding:15px;
+border-radius:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+.genre{
+opacity:.6;
+font-size:14px;
+}
+
+.empty{
+text-align:center;
+opacity:.6;
+margin-top:30px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>🎮 Oyun Önerici</h1>
+
+<div class="controls">
+
+<button onclick="suggestRandom()">
+Bana Oyun Öner
+</button>
+
+<select id="genre" onchange="loadGames()">
+<option value="">Tüm Türler</option>
+<option>Aksiyon</option>
+<option>Macera</option>
+<option>RPG</option>
+<option>FPS</option>
+<option>Strateji</option>
+<option>Simülasyon</option>
+<option>Yarış</option>
+<option>Korku</option>
+</select>
+
+</div>
+
+<div id="randomGame">
+Henüz öneri yok.
+</div>
+
+<div id="games"></div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL="https://erlkkobrxrmdmcihzqjz.supabase.co/rest/v1/";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVybGtrb2JyeHJtZG1jaWh6cWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NDYzNjAsImV4cCI6MjA5OTUyMjM2MH0.YWsgHLg0mUV8c-lvFJfWkjOICtueK52aLFDS4xXhOpI";
+
+const supabase = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+let userId=localStorage.getItem("user_id");
+
+if(!userId){
+userId=crypto.randomUUID();
+localStorage.setItem("user_id",userId);
+}
+
+let allGames=[];
+let played=[];
+
+async function loadPlayed(){
+
+const {data}=await supabase
+.from("played_games")
+.select("game_id")
+.eq("user_id",userId);
+
+played=data.map(x=>x.game_id);
+
+}
+
+async function loadGames(){
+
+await loadPlayed();
+
+let query=supabase
+.from("games")
+.select("*");
+
+const genre=document.getElementById("genre").value;
+
+if(genre!="")
+query=query.eq("genre",genre);
+
+const {data}=await query;
+
+allGames=data.filter(g=>!played.includes(g.id));
+
+renderGames();
+
+}
+
+function renderGames(){
+
+const div=document.getElementById("games");
+
+if(allGames.length==0){
+
+div.innerHTML="<div class='empty'>Gösterilecek oyun kalmadı.</div>";
+return;
+
+}
+
+div.innerHTML="";
+
+allGames.forEach(game=>{
+
+div.innerHTML+=`
+<div class="card">
+
+<div>
+<div><b>${game.title}</b></div>
+<div class="genre">${game.genre}</div>
+</div>
+
+<button onclick="playedGame(${game.id})">
+Oynadım
+</button>
+
+</div>
+`;
+
+});
+
+}
+
+async function playedGame(id){
+
+await supabase
+.from("played_games")
+.insert({
+user_id:userId,
+game_id:id
+});
+
+await loadGames();
+
+}
+
+function suggestRandom(){
+
+if(allGames.length==0){
+
+document.getElementById("randomGame").innerHTML=
+"Önerilecek oyun kalmadı.";
+
+return;
+
+}
+
+const random=allGames[Math.floor(Math.random()*allGames.length)];
+
+document.getElementById("randomGame").innerHTML=
+`
+🎲<br><br>
+<b>${random.title}</b><br>
+<small>${random.genre}</small>
+`;
+
+}
+
+loadGames();
+
+</script>
+
+</body>
+</html>
