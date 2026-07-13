@@ -539,21 +539,8 @@ function modalKapat() {
     document.body.style.overflow = 'auto';
 }
 
-// Modal dışına tıklayınca kapat (güvenli kontrollerle)
-const modalElement = document.getElementById('oyunModal');
-if (modalElement) {
-    modalElement.addEventListener('click', function(e) {
-        if (e.target === this) {
-            modalKapat();
-        }
-    });
-} else {
-    console.log('Modal elementi bulunamadı!');
-}
-
-// ESC tuşu ile kapat
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
+document.getElementById('oyunModal').addEventListener('click', function(e) {
+    if (e.target === this) {
         modalKapat();
     }
 });
