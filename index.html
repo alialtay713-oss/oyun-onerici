@@ -504,6 +504,56 @@
         window.filtrele = filtrele;
         window.oynadimEkle = oynadimEkle;
         window.oyunlariYenile = oyunlariYenile;
+
+// ========== MODAL FONKSİYONLARI (BASİT) ==========
+
+function modalAc(oyun) {
+    console.log('Modal açılıyor:', oyun.isim); // Konsolda kontrol et
+    
+    const modal = document.getElementById('oyunModal');
+    const icerik = document.getElementById('modalIcerik');
+    
+    // Basit içerik
+    icerik.innerHTML = `
+        <h2 style="margin-top:0;color:#fff;">${oyun.isim}</h2>
+        ${oyun.resim_url ? `<img src="${oyun.resim_url}" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-bottom:12px;" />` : ''}
+        <p><strong>🎮 Tür:</strong> ${oyun.tur || 'Bilinmiyor'}</p>
+        <p><strong>📅 Yıl:</strong> ${oyun.cikis_yili || 'Bilinmiyor'}</p>
+        <p><strong>⭐ Puan:</strong> ${oyun.puan || '?'}</p>
+        <p><strong>🛠️ Geliştirici:</strong> ${oyun.gelistirici || 'Bilinmiyor'}</p>
+        <p><strong>📱 Platform:</strong> ${oyun.platformlar || 'Bilinmiyor'}</p>
+        <p style="margin-top:12px;line-height:1.6;color:#ccc;">${oyun.aciklama || 'Açıklama yok.'}</p>
+        <div style="margin-top:16px;">
+            <button class="oynadim-btn" onclick="oynadimEkle(${oyun.id}); modalKapat();">✅ Oynadım</button>
+            ${oyun.web_sitesi ? `<a href="${oyun.web_sitesi}" target="_blank" style="background:#6c5ce7;padding:8px 20px;border-radius:20px;color:white;text-decoration:none;display:inline-block;margin-left:8px;">🔗 Web Sitesi</a>` : ''}
+            <button onclick="modalKapat()" style="background:#2d2d4a;padding:8px 20px;border-radius:20px;border:none;color:white;cursor:pointer;margin-left:8px;">Kapat</button>
+        </div>
+    `;
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function modalKapat() {
+    document.getElementById('oyunModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Modal dışına tıklayınca kapat
+document.getElementById('oyunModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        modalKapat();
+    }
+});
+
+// ESC tuşu ile kapat
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        modalKapat();
+    }
+});
+
+        
     </script>
 
     <!-- MODAL -->
