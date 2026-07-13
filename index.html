@@ -6,20 +6,29 @@
     <title>🎮 Oyun Önerici</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #0f0f1a; color: #eee; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; background: #0f0f1a; color: #eee; }
         .container { background: #1a1a2e; padding: 30px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
-        button { background: #6c5ce7; color: white; border: none; padding: 12px 28px; border-radius: 30px; font-size: 16px; cursor: pointer; margin: 6px; }
-        button:hover { background: #5a4bd1; }
-        .oyun-karti { background: #252541; padding: 20px; border-radius: 12px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center; }
+        h1 { margin-bottom: 20px; }
+        button { background: #6c5ce7; color: white; border: none; padding: 12px 28px; border-radius: 30px; font-size: 16px; cursor: pointer; margin: 6px 4px; transition: 0.2s; }
+        button:hover { background: #5a4bd1; transform: scale(1.02); }
+        .filtre-btn { background: #2d2d4a; padding: 8px 18px; font-size: 14px; }
+        .filtre-btn:hover { background: #3d3d5c; }
+        .oyun-karti { background: #252541; padding: 20px; border-radius: 12px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .oyun-bilgi h3 { margin: 0; color: #fff; }
         .oyun-bilgi p { margin: 6px 0 0; color: #aaa; }
-        .tur-etiketi { background: #3d3d5c; padding: 4px 14px; border-radius: 20px; font-size: 14px; color: #c7c7e6; }
-        .oynadim-btn { background: #00b894; padding: 6px 18px; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .tur-etiketi { background: #3d3d5c; padding: 4px 14px; border-radius: 20px; font-size: 14px; color: #c7c7e6; display: inline-block; margin-top: 6px; }
+        .oynadim-btn { background: #00b894; padding: 8px 20px; border-radius: 20px; border: none; color: white; cursor: pointer; font-size: 14px; }
         .oynadim-btn:hover { background: #00a381; }
         #sonuc { min-height: 100px; margin-top: 20px; }
-        #oynananlar { margin-top: 30px; }
-        #oynananlar span { background: #2d2d4a; padding: 4px 14px; border-radius: 16px; margin: 4px; display: inline-block; font-size: 14px; }
-        .filtreler { margin: 16px 0; }
+        #sonuc p { color: #888; }
+        #oynananlar { margin-top: 30px; border-top: 1px solid #2d2d4a; padding-top: 20px; }
+        #oynananlar h3 { margin-bottom: 12px; }
+        #oynananListesi span { background: #2d2d4a; padding: 4px 16px; border-radius: 16px; margin: 4px; display: inline-block; font-size: 14px; }
+        .filtreler { margin: 16px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .filtreler span { margin-right: 8px; font-weight: bold; }
+        .hata-mesaji { color: #ff6b6b; }
+        .basari-mesaji { color: #00b894; }
     </style>
 </head>
 <body>
@@ -28,81 +37,101 @@
     <h1>🎮 Oyun Önerici</h1>
 
     <div>
-        <button onclick="rastgeleOner()">🎲 Bana Oyun Öner</button>
+        <button id="rastgeleBtn">🎲 Bana Oyun Öner</button>
     </div>
 
     <div class="filtreler">
         <span>Tür:</span>
-        <button onclick="filtrele('Tüm Türler')">Tümü</button>
-        <button onclick="filtrele('Aksiyon')">Aksiyon</button>
-        <button onclick="filtrele('Macera')">Macera</button>
-        <button onclick="filtrele('RPG')">RPG</button>
-        <button onclick="filtrele('Strateji')">Strateji</button>
-        <button onclick="filtrele('Simülasyon')">Simülasyon</button>
+        <button class="filtre-btn" data-tur="Tüm Türler">Tümü</button>
+        <button class="filtre-btn" data-tur="Aksiyon">Aksiyon</button>
+        <button class="filtre-btn" data-tur="Macera">Macera</button>
+        <button class="filtre-btn" data-tur="RPG">RPG</button>
+        <button class="filtre-btn" data-tur="Strateji">Strateji</button>
+        <button class="filtre-btn" data-tur="Simülasyon">Simülasyon</button>
+        <button class="filtre-btn" data-tur="Platform">Platform</button>
+        <button class="filtre-btn" data-tur="Bulmaca">Bulmaca</button>
+        <button class="filtre-btn" data-tur="Sosyal">Sosyal</button>
     </div>
 
     <div id="sonuc">
-        <p style="color: #888;">Henüz öneri yok.</p>
+        <p>Henüz öneri yok. Butona tıkla!</p>
     </div>
 
     <div id="oynananlar">
         <h3>✅ Oynadıklarım</h3>
-        <div id="oynananListesi"></div>
+        <div id="oynananListesi"><span style="color:#888;">Henüz oyun oynamadın.</span></div>
     </div>
 </div>
 
 <script>
-    // ⚡ SUPABASE BAĞLANTISI (SADECE BURADA TANIMLI)
+    // ════════════════════════════════════════════
+    // 1️⃣ SUPABASE BAĞLANTISI (SADECE BİR KERE)
+    // ════════════════════════════════════════════
     const SUPABASE_URL = "https://erlkkobrxrmdmcihzqjz.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
 
+    // supabase değişkeni SADECE BURADA tanımlanıyor
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ════════════════════════════════════════════
+    // 2️⃣ KULLANICI ID (localStorage'da sakla)
+    // ════════════════════════════════════════════
     let kullaniciId = localStorage.getItem('kullaniciId');
     if (!kullaniciId) {
         kullaniciId = 'user_' + Math.random().toString(36).slice(2, 10);
         localStorage.setItem('kullaniciId', kullaniciId);
     }
+    console.log('Kullanıcı ID:', kullaniciId);
 
-    let mevcutOyunlar = [];
-    let oynananOyunIds = [];
+    // ════════════════════════════════════════════
+    // 3️⃣ VERİTABANI FONKSİYONLARI
+    // ════════════════════════════════════════════
 
-    // 📥 Oyunları getir
+    // Tüm oyunları getir
     async function oyunlariGetir() {
         const { data, error } = await supabase.from('oyunlar').select('*');
         if (error) {
-            console.error('Veri çekme hatası:', error);
+            console.error('❌ Veri çekme hatası:', error);
             return [];
         }
+        console.log('📦 Oyunlar yüklendi:', data?.length || 0, 'adet');
         return data || [];
     }
 
-    // 👤 Kullanıcının oynadığı oyunları getir
+    // Kullanıcının oynadığı oyun ID'lerini getir
     async function oynananlariGetir() {
         const { data, error } = await supabase
             .from('oynananlar')
             .select('oyun_id')
             .eq('kullanici_id', kullaniciId);
         if (error) {
-            console.error('Oynananlar hatası:', error);
+            console.error('❌ Oynananlar hatası:', error);
             return [];
         }
         return data.map(item => item.oyun_id);
     }
 
+    // ════════════════════════════════════════════
+    // 4️⃣ ANA FONKSİYONLAR
+    // ════════════════════════════════════════════
+
     // 🎲 Rastgele oyun öner
     async function rastgeleOner() {
+        console.log('🎲 Rastgele oyun öneriliyor...');
+        const sonucDiv = document.getElementById('sonuc');
+        sonucDiv.innerHTML = '<p>🔄 Oyun aranıyor...</p>';
+
         const butunOyunlar = await oyunlariGetir();
         if (butunOyunlar.length === 0) {
-            document.getElementById('sonuc').innerHTML = '<p style="color: #ff6b6b;">Veritabanında oyun yok! Lütfen önce oyun ekleyin.</p>';
+            sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Veritabanında oyun yok! Lütfen önce oyun ekleyin.</p>';
             return;
         }
 
-        oynananOyunIds = await oynananlariGetir();
-        const filtrelenmis = butunOyunlar.filter(o => !oynananOyunIds.includes(o.id));
+        const oynananlar = await oynananlariGetir();
+        const filtrelenmis = butunOyunlar.filter(o => !oynananlar.includes(o.id));
 
         if (filtrelenmis.length === 0) {
-            document.getElementById('sonuc').innerHTML = '<p style="color: #fdcb6e;">🎉 Tüm oyunları oynamışsın! Yeni oyunlar eklemeyi dene.</p>';
+            sonucDiv.innerHTML = '<p class="basari-mesaji">🎉 Tüm oyunları oynamışsın! Yeni oyunlar eklemeyi dene.</p>';
             return;
         }
 
@@ -117,7 +146,7 @@
                 <div class="oyun-bilgi">
                     <h3>${oyun.isim}</h3>
                     <p>${oyun.aciklama || 'Açıklama yok'}</p>
-                    <span class="tur-etiketi">${oyun.tur}</span>
+                    <span class="tur-etiketi">${oyun.tur || 'Türsüz'}</span>
                 </div>
                 <div>
                     <button class="oynadim-btn" onclick="oynadimEkle(${oyun.id})">✅ Oynadım</button>
@@ -128,18 +157,19 @@
 
     // ✅ Oynadım ekle
     async function oynadimEkle(oyunId) {
+        console.log('✅ Oynadım eklendi:', oyunId);
         const { error } = await supabase
             .from('oynananlar')
             .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
 
         if (error) {
-            alert('Bir hata oluştu: ' + error.message);
+            alert('❌ Bir hata oluştu: ' + error.message);
+            console.error('❌ Ekleme hatası:', error);
             return;
         }
 
-        oynananOyunIds.push(oyunId);
+        document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! Başka bir oyun önereyim mi? 🎲</p>';
         oynananListesiniGuncelle();
-        document.getElementById('sonuc').innerHTML = '<p style="color: #00b894;">✅ Oyun listene eklendi! Başka bir oyun önereyim mi? 🎲</p>';
     }
 
     // 🔄 Oynanan listesini güncelle
@@ -152,7 +182,7 @@
 
         const container = document.getElementById('oynananListesi');
         if (isimler.length === 0) {
-            container.innerHTML = '<span style="color: #888;">Henüz oyun oynamadın.</span>';
+            container.innerHTML = '<span style="color:#888;">Henüz oyun oynamadın.</span>';
         } else {
             container.innerHTML = isimler.map(isim => `<span>${isim}</span>`).join('');
         }
@@ -160,29 +190,33 @@
 
     // 🔍 Filtrele
     async function filtrele(tur) {
+        console.log('🔍 Filtreleme:', tur);
+        const sonucDiv = document.getElementById('sonuc');
+        sonucDiv.innerHTML = '<p>🔄 Oyunlar filtreleniyor...</p>';
+
         const butunOyunlar = await oyunlariGetir();
-        oynananOyunIds = await oynananlariGetir();
+        const oynananlar = await oynananlariGetir();
 
         let filtrelenmis;
         if (tur === 'Tüm Türler') {
-            filtrelenmis = butunOyunlar.filter(o => !oynananOyunIds.includes(o.id));
+            filtrelenmis = butunOyunlar.filter(o => !oynananlar.includes(o.id));
         } else {
-            filtrelenmis = butunOyunlar.filter(o => o.tur === tur && !oynananOyunIds.includes(o.id));
+            filtrelenmis = butunOyunlar.filter(o => o.tur === tur && !oynananlar.includes(o.id));
         }
 
         if (filtrelenmis.length === 0) {
-            document.getElementById('sonuc').innerHTML = `<p style="color: #fdcb6e;">Bu türde oynanmamış oyun kalmadı! 🎉</p>`;
+            sonucDiv.innerHTML = `<p class="basari-mesaji">🎉 Bu türde oynanmamış oyun kalmadı!</p>`;
             return;
         }
 
         let html = '';
-        filtrelenmis.slice(0, 6).forEach(o => {
+        filtrelenmis.slice(0, 8).forEach(o => {
             html += `
                 <div class="oyun-karti">
                     <div class="oyun-bilgi">
                         <h3>${o.isim}</h3>
                         <p>${o.aciklama || ''}</p>
-                        <span class="tur-etiketi">${o.tur}</span>
+                        <span class="tur-etiketi">${o.tur || 'Türsüz'}</span>
                     </div>
                     <div>
                         <button class="oynadim-btn" onclick="oynadimEkle(${o.id})">✅ Oynadım</button>
@@ -190,18 +224,35 @@
                 </div>
             `;
         });
-        document.getElementById('sonuc').innerHTML = html;
+        sonucDiv.innerHTML = html;
     }
 
-    // 🚀 Sayfa açıldığında çalıştır
+    // ════════════════════════════════════════════
+    // 5️⃣ SAYFA YÜKLENDİĞİNDE
+    // ════════════════════════════════════════════
+
     window.onload = function() {
+        console.log('🚀 Sayfa yüklendi!');
         oynananListesiniGuncelle();
+
+        // Butonlara olay dinleyicileri ekle (onclick yerine addEventListener)
+        document.getElementById('rastgeleBtn').addEventListener('click', rastgeleOner);
+
+        document.querySelectorAll('.filtre-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                filtrele(this.dataset.tur);
+            });
+        });
     };
 
-    // Hata ayıklama için global yap
+    // ════════════════════════════════════════════
+    // 6️⃣ GLOBAL FONKSİYONLAR (HTML içinden çağrılmak için)
+    // ════════════════════════════════════════════
     window.rastgeleOner = rastgeleOner;
     window.filtrele = filtrele;
     window.oynadimEkle = oynadimEkle;
+
+    console.log('✅ Tüm fonksiyonlar yüklendi!');
 </script>
 
 </body>
