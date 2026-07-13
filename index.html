@@ -450,32 +450,31 @@ document.addEventListener('keydown', function(e) {
         }
 
         function oyunGoster(oyun) {
-            const resimHtml = oyun.resim_url ?
-                `<img src="${oyun.resim_url}" alt="${oyun.isim}" class="oyun-resim" />` :
-                `<div class="oyun-resim" style="display:flex;align-items:center;justify-content:center;color:#888;">📷 Yok</div>`;
+    const resimHtml = oyun.resim_url ?
+        `<img src="${oyun.resim_url}" alt="${oyun.isim}" class="oyun-resim" />` :
+        `<div class="oyun-resim" style="display:flex;align-items:center;justify-content:center;color:#888;">📷 Yok</div>`;
 
-            document.getElementById('sonuc').innerHTML = `
-                    <div class="oyun-karti">
-                        ${resimHtml}
-                        <div class="oyun-bilgi">
-                            <h3>${oyun.isim}</h3>
-                            <div class="oyun-detaylari">
-                                <span class="detay-etiketi">📅 ${oyun.cikis_yili}</span>
-                                <span class="detay-etiketi">⭐ ${oyun.puan}</span>
-                                <span class="detay-etiketi">🎯 Metacritic: ${oyun.metacritic}</span>
-                                <span class="detay-etiketi">🛠️ ${oyun.gelistirici}</span>
-                                <span class="detay-etiketi">📱 ${oyun.platformlar}</span>
-                            </div>
-                            <p>${oyun.aciklama ? oyun.aciklama.substring(0, 250) + '...' : 'Açıklama yok'}</p>
-                            <span class="tur-etiketi">🎮 ${oyun.tur}</span>
-                            <div>
-                                <button class="oynadim-btn" onclick="oynadimEkle(${oyun.id})">✅ Oynadım</button>
-                                ${oyun.web_sitesi ? `<a href="${oyun.web_sitesi}" target="_blank" style="color:#6c5ce7;margin-left:12px;font-size:14px;">🔗 Web Sitesi</a>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-        }
+    document.getElementById('sonuc').innerHTML = `
+        <div class="oyun-karti" onclick="modalAc(${JSON.stringify(oyun).replace(/"/g, '&quot;')})" style="cursor:pointer;">
+            ${resimHtml}
+            <div class="oyun-bilgi">
+                <h3>${oyun.isim}</h3>
+                <div class="oyun-detaylari">
+                    <span class="detay-etiketi">📅 ${oyun.cikis_yili}</span>
+                    <span class="detay-etiketi">⭐ ${oyun.puan}</span>
+                    <span class="detay-etiketi">🎯 ${oyun.metacritic}</span>
+                    <span class="detay-etiketi">🛠️ ${oyun.gelistirici}</span>
+                </div>
+                <p>${oyun.aciklama ? oyun.aciklama.substring(0, 150) + '...' : 'Açıklama yok'}</p>
+                <span class="tur-etiketi">🎮 ${oyun.tur}</span>
+                <div style="margin-top:8px;">
+                    <button class="oynadim-btn" onclick="event.stopPropagation(); oynadimEkle(${oyun.id})">✅ Oynadım</button>
+                    <span style="color:#6c5ce7;font-size:13px;margin-left:12px;">👆 Detaylar için tıkla</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
        async function oynadimEkle(oyunId) {
     const { error } = await supabase
