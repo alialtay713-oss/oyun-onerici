@@ -341,17 +341,25 @@
         }
 
         async function oynadimEkle(oyunId) {
-            const { error } = await supabase
-                .from('oynananlar')
-                .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
+    const { error } = await supabase
+        .from('oynananlar')
+        .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
 
-            if (error) {
-                alert('❌ Hata: ' + error.message);
-                return;
-            }
+    if (error) {
+        alert('❌ Hata: ' + error.message);
+        return;
+    }
 
-            document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! 🎲</p>';
-            oynananListesiniGuncelle();
+    // ✅ Listeyi güncelle
+    await oynananListesiniGuncelle();
+    
+    // ✅ Ekrandaki öneriyi temizle (yerine mesaj göster)
+    document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! Başka bir oyun önerelim mi? 🎲</p>';
+    
+    // ✅ Oyun listesini yeniden yükle (böylece oynadığın oyun bir daha gelmez)
+    // NOT: Eğer çok fazla oyun varsa bu kısmı yoruma alabilirsin
+    // tumOyunlar = await oyunlariGetir();
+}
         }
 
         async function oynananListesiniGuncelle() {
