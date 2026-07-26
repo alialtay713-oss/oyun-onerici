@@ -449,20 +449,27 @@ async function oyunlariYenile() {
     `;
 }
 
-       async function oynadimEkle(oyunId) {
+      async function oynadimEkle(oyunId) {
     const { error } = await supabase
         .from('oynananlar')
         .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
 
     if (error) {
+        console.error('❌ Ekleme hatası:', error);
         alert('❌ Hata: ' + error.message);
         return;
     }
 
+    console.log('✅ Oyun eklendi, ID:', oyunId);  // <--- Konsola yazdır
+    
     document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! 🎲</p>';
-    oynananListesiniGuncelle();
-
-        }
+    
+    // Liste güncellemesini bekle
+    await oynananListesiniGuncelle();
+    
+    // Konsolda listeyi kontrol et
+    console.log('📋 Güncel oynananlar:', await oynananlariGetir());
+}
 
         async function oynananListesiniGuncelle() {
             const oynananlar = await oynananlariGetir();
