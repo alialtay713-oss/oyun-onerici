@@ -7,452 +7,430 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
     </script>
     <style>
-       /* ========== RESET & GENEL ========== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        /* ========== RESET & GENEL ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            color: #e4e4e7;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0a0a0f 70%);
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-<!-- ========== GİRİŞ / KAYIT FORMU ========== -->
-<div id="authContainer" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #0a0a0f; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;">
-    <div style="background: #1a1a2e; padding: 40px; border-radius: 20px; max-width: 400px; width: 90%; border: 1px solid rgba(255,255,255,0.06);">
-        <h2 style="text-align: center; margin-bottom: 10px; color: #fff;">🎮 Oyun Önerici</h2>
-        <p style="text-align: center; color: #8b8ba3; margin-bottom: 30px;">Devam etmek için giriş yap</p>
-        
-        <!-- Giriş Formu -->
-        <div id="loginForm">
-            <input type="email" id="loginEmail" placeholder="E-posta" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; margin-bottom: 12px; font-size: 1rem;">
-            <input type="password" id="loginPassword" placeholder="Şifre" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; margin-bottom: 12px; font-size: 1rem;">
-            <button id="loginBtn" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6c5ce7, #a855f7); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer;">Giriş Yap</button>
-            <p style="text-align: center; color: #8b8ba3; margin-top: 12px; font-size: 0.9rem;">
-                Hesabın yok mu? <a href="#" id="showRegister" style="color: #6c5ce7; text-decoration: none;">Kayıt Ol</a>
-            </p>
-        </div>
+        /* ========== BAŞLIK ========== */
+        .baslik {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .baslik h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6c5ce7, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            letter-spacing: -1px;
+        }
+        .baslik h1 span {
+            -webkit-text-fill-color: #fff;
+        }
+        .baslik p {
+            color: #8b8ba3;
+            font-size: 1.1rem;
+            margin-top: 6px;
+        }
 
-        <!-- Kayıt Formu -->
-        <div id="registerForm" style="display: none;">
-            <input type="email" id="registerEmail" placeholder="E-posta" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; margin-bottom: 12px; font-size: 1rem;">
-            <input type="password" id="registerPassword" placeholder="Şifre (min 6 karakter)" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; margin-bottom: 12px; font-size: 1rem;">
-            <button id="registerBtn" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #00b894, #00a381); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer;">Kayıt Ol</button>
-            <p style="text-align: center; color: #8b8ba3; margin-top: 12px; font-size: 0.9rem;">
-                Zaten hesabın var mı? <a href="#" id="showLogin" style="color: #6c5ce7; text-decoration: none;">Giriş Yap</a>
-            </p>
-        </div>
-    </div>
-</div>
+        /* ========== BUTON GRUBU ========== */
+        .buton-grubu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            margin: 16px 0 8px 0;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-buyuk {
+            padding: 14px 34px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border-radius: 60px;
+            letter-spacing: 0.3px;
+            gap: 12px;
+        }
+        .btn-buyuk svg {
+            flex-shrink: 0;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6c5ce7, #a855f7);
+            color: #fff;
+            box-shadow: 0 4px 25px rgba(108, 92, 231, 0.35);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(108, 92, 231, 0.55);
+        }
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: #c7c7e6;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        .btn-secondary:active {
+            transform: scale(0.96);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            pointer-events: none;
+        }
 
-body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0a0a0f;
-    color: #e4e4e7;
-    min-height: 100vh;
-    padding: 20px;
-    background-image: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0a0a0f 70%);
-}
+        /* ========== FİLTRELER ========== */
+        .filtreler {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 24px 0;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .filtreler span {
+            font-weight: 600;
+            color: #a5a5c0;
+            margin-right: 8px;
+        }
+        .filtre-btn {
+            padding: 8px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            background: transparent;
+            color: #a5a5c0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .filtre-btn:hover {
+            background: rgba(108, 92, 231, 0.15);
+            color: #fff;
+            border-color: #6c5ce7;
+        }
+        .filtre-btn.aktif {
+            background: #6c5ce7;
+            color: #fff;
+            border-color: #6c5ce7;
+        }
 
-.container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px;
-}
+        /* ========== OYUN KARTI ========== */
+        .oyun-karti {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
+            display: flex;
+            gap: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .oyun-karti:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(108, 92, 231, 0.3);
+        }
+        .oyun-resim {
+            width: 180px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 12px;
+            flex-shrink: 0;
+            background: #1a1a2e;
+        }
+        .oyun-bilgi {
+            flex: 1;
+        }
+        .oyun-bilgi h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .oyun-bilgi p {
+            color: #a5a5c0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .oyun-detaylari {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 8px 0;
+        }
+        .detay-etiketi {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #a5a5c0;
+        }
+        .tur-etiketi {
+            background: rgba(108, 92, 231, 0.2);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #c4b5fd;
+            display: inline-block;
+            margin-top: 6px;
+        }
+        .oyun-aksiyon {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .oynadim-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #00b894, #00a381);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .oynadim-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.4);
+        }
+        .oyun-detay-link {
+            color: #8b8ba3;
+            font-size: 0.85rem;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .oyun-detay-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
 
-/* ========== BAŞLIK ========== */
-.baslik {
-    text-align: center;
-    margin-bottom: 30px;
-}
-.baslik h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #6c5ce7, #a855f7, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: none;
-    letter-spacing: -1px;
-}
-.baslik h1 span {
-    -webkit-text-fill-color: #fff;
-}
-.baslik p {
-    color: #8b8ba3;
-    font-size: 1.1rem;
-    margin-top: 6px;
-}
+        /* ========== OYNADIM LİSTESİ ========== */
+        #oynananlar {
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 30px;
+        }
+        #oynananlar h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+        #oynananListesi {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        #oynananListesi span {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: #c7c7e6;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
 
-/* ========== BUTONLAR ========== */
-.btn {
-    padding: 12px 28px;
-    border: none;
-    border-radius: 50px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-.btn-primary {
-    background: linear-gradient(135deg, #6c5ce7, #a855f7);
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
-}
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
-}
-.btn-secondary {
-    background: #2d2d4a;
-    color: #c7c7e6;
-}
-.btn-secondary:hover {
-    background: #3d3d5c;
-    transform: translateY(-2px);
-}
-.btn-success {
-    background: linear-gradient(135deg, #00b894, #00a381);
-    color: #fff;
-}
-.btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 184, 148, 0.4);
-}
+        /* ========== MESAJLAR ========== */
+        .hata-mesaji {
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border-left: 4px solid #f87171;
+        }
+        .basari-mesaji {
+            color: #6ee7b7;
+            background: rgba(110, 231, 183, 0.1);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border-left: 4px solid #6ee7b7;
+        }
+        .yukleniyor {
+            color: #fcd34d;
+            background: rgba(252, 211, 77, 0.1);
+            padding: 16px 20px;
+            border-radius: 12px;
+            border-left: 4px solid #fcd34d;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
-/* ========== FİLTRELER ========== */
-.filtreler {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin: 24px 0;
-    padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-.filtreler span {
-    font-weight: 600;
-    color: #a5a5c0;
-    margin-right: 8px;
-}
-.filtre-btn {
-    padding: 8px 20px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50px;
-    background: transparent;
-    color: #a5a5c0;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-.filtre-btn:hover {
-    background: rgba(108, 92, 231, 0.15);
-    color: #fff;
-    border-color: #6c5ce7;
-}
-.filtre-btn.aktif {
-    background: #6c5ce7;
-    color: #fff;
-    border-color: #6c5ce7;
-}
+        /* ========== MODAL ========== */
+        #oyunModal .modal-box {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+        }
+        #oyunModal .modal-box h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+        }
+        #oyunModal .modal-box .detay {
+            color: #a5a5c0;
+        }
+        #oyunModal .modal-box .detay span {
+            color: #fff;
+            font-weight: 600;
+        }
 
-/* ========== OYUN KARTI ========== */
-.oyun-karti {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
-    padding: 20px;
-    margin: 16px 0;
-    display: flex;
-    gap: 20px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-.oyun-karti:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-    border-color: rgba(108, 92, 231, 0.3);
-}
-.oyun-resim {
-    width: 180px;
-    height: 110px;
-    object-fit: cover;
-    border-radius: 12px;
-    flex-shrink: 0;
-    background: #1a1a2e;
-}
-.oyun-bilgi {
-    flex: 1;
-}
-.oyun-bilgi h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 6px;
-}
-.oyun-bilgi p {
-    color: #a5a5c0;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.oyun-detaylari {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 8px 0;
-}
-.detay-etiketi {
-    background: rgba(255, 255, 255, 0.06);
-    padding: 3px 14px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    color: #a5a5c0;
-}
-.tur-etiketi {
-    background: rgba(108, 92, 231, 0.2);
-    padding: 4px 16px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    color: #c4b5fd;
-    display: inline-block;
-    margin-top: 6px;
-}
-.oyun-aksiyon {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-    flex-wrap: wrap;
-}
-.oynadim-btn {
-    padding: 8px 20px;
-    border: none;
-    border-radius: 50px;
-    background: linear-gradient(135deg, #00b894, #00a381);
-    color: #fff;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.oynadim-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(0, 184, 148, 0.4);
-}
-.oyun-detay-link {
-    color: #8b8ba3;
-    font-size: 0.85rem;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 50px;
-    background: rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-}
-.oyun-detay-link:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
-
-/* ========== OYNADIM LİSTESİ ========== */
-#oynananlar {
-    margin-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    padding-top: 30px;
-}
-#oynananlar h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: #fff;
-}
-#oynananListesi {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-#oynananListesi span {
-    background: rgba(255, 255, 255, 0.06);
-    padding: 6px 18px;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    color: #c7c7e6;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-/* ========== MESAJLAR ========== */
-.hata-mesaji {
-    color: #f87171;
-    background: rgba(248, 113, 113, 0.1);
-    padding: 16px 20px;
-    border-radius: 12px;
-    border-left: 4px solid #f87171;
-}
-.basari-mesaji {
-    color: #6ee7b7;
-    background: rgba(110, 231, 183, 0.1);
-    padding: 16px 20px;
-    border-radius: 12px;
-    border-left: 4px solid #6ee7b7;
-}
-.yukleniyor {
-    color: #fcd34d;
-    background: rgba(252, 211, 77, 0.1);
-    padding: 16px 20px;
-    border-radius: 12px;
-    border-left: 4px solid #fcd34d;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-}
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* ========== MODAL ========== */
-#oyunModal .modal-box {
-    background: #1a1a2e;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 20px;
-}
-#oyunModal .modal-box h2 {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #fff;
-}
-#oyunModal .modal-box .detay {
-    color: #a5a5c0;
-}
-#oyunModal .modal-box .detay span {
-    color: #fff;
-    font-weight: 600;
-}
-
-/* ========== RESPONSIVE ========== */
-@media (max-width: 700px) {
-    .baslik h1 {
-        font-size: 2rem;
-    }
-    .oyun-karti {
-        flex-direction: column;
-    }
-    .oyun-resim {
-        width: 100%;
-        height: 160px;
-    }
-    .filtreler {
-        gap: 6px;
-        padding: 12px;
-    }
-    .filtre-btn {
-        padding: 6px 14px;
-        font-size: 0.8rem;
-    }
-    #oynananListesi span {
-        font-size: 0.8rem;
-        padding: 4px 14px;
-    }
-}
-/* ========== BUTON GRUBU ========== */
-.buton-grubu {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    justify-content: center;
-    margin: 16px 0 8px 0;
-}
-
-.btn-buyuk {
-    padding: 14px 34px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    border-radius: 60px;
-    letter-spacing: 0.3px;
-    gap: 12px;
-}
-
-.btn-buyuk svg {
-    flex-shrink: 0;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #6c5ce7, #a855f7);
-    color: #fff;
-    box-shadow: 0 4px 25px rgba(108, 92, 231, 0.35);
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-}
-.btn-primary:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 8px 40px rgba(108, 92, 231, 0.55);
-}
-.btn-primary:active {
-    transform: scale(0.96);
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.06);
-    color: #c7c7e6;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(4px);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-}
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-3px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-}
-.btn-secondary:active {
-    transform: scale(0.96);
-}
-
-/* Butonların disabled hali */
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none !important;
-    pointer-events: none;
-}
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 700px) {
+            .baslik h1 {
+                font-size: 2rem;
+            }
+            .oyun-karti {
+                flex-direction: column;
+            }
+            .oyun-resim {
+                width: 100%;
+                height: 160px;
+            }
+            .filtreler {
+                gap: 6px;
+                padding: 12px;
+            }
+            .filtre-btn {
+                padding: 6px 14px;
+                font-size: 0.8rem;
+            }
+            #oynananListesi span {
+                font-size: 0.8rem;
+                padding: 4px 14px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="baslik">
-    <h1>🎮 <span>Oyun</span> Önerici</h1>
-    <p>Son 10 yılın en iyi oyunlarını keşfet</p>
-</div>
-  <div class="buton-grubu">
-    <button id="rastgeleBtn" class="btn btn-primary btn-buyuk">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 12a8 8 0 0 1 16 0 8 8 0 0 1-16 0z"/>
-            <path d="M12 8v4l3 3"/>
-        </svg>
-        Bana Oyun Öner
-    </button>
-    <button id="yenileBtn" class="btn btn-secondary btn-buyuk">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M23 4v6h-6"/>
-            <path d="M1 20v-6h6"/>
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-        </svg>
-        Oyunları Yenile
-    </button>
-</div>
+    <!-- ========== GİRİŞ / KAYIT FORMU ========== -->
+    <div id="authContainer" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #0a0a0f; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;">
+        <div style="background: #1a1a2e; padding: 40px; border-radius: 20px; max-width: 400px; width: 90%; border: 1px solid rgba(255,255,255,0.06);">
+            <h2 style="text-align: center; margin-bottom: 10px; color: #fff;">🎮 Oyun Önerici</h2>
+            <p style="text-align: center; color: #8b8ba3; margin-bottom: 30px;">Devam etmek için giriş yap</p>
+
+            <!-- Giriş Formu -->
+            <div id="loginForm">
+                <input type="email" id="loginEmail" placeholder="E-posta" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; margin-bottom: 12px; font-size: 1rem;">
+                <input type="password" id="loginPassword" placeholder="Şifre" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; margin-bottom: 12px; font-size: 1rem;">
+                <button id="loginBtn" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6c5ce7, #a855f7); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer;">Giriş Yap</button>
+                <p style="text-align: center; color: #8b8ba3; margin-top: 12px; font-size: 0.9rem;">
+                    Hesabın yok mu? <a href="#" id="showRegister" style="color: #6c5ce7; text-decoration: none;">Kayıt Ol</a>
+                </p>
+            </div>
+
+            <!-- Kayıt Formu -->
+            <div id="registerForm" style="display: none;">
+                <input type="email" id="registerEmail" placeholder="E-posta" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; margin-bottom: 12px; font-size: 1rem;">
+                <input type="password" id="registerPassword" placeholder="Şifre (min 6 karakter)" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #fff; margin-bottom: 12px; font-size: 1rem;">
+                <button id="registerBtn" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #00b894, #00a381); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer;">Kayıt Ol</button>
+                <p style="text-align: center; color: #8b8ba3; margin-top: 12px; font-size: 0.9rem;">
+                    Zaten hesabın var mı? <a href="#" id="showLogin" style="color: #6c5ce7; text-decoration: none;">Giriş Yap</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ANA SAYFA ========== -->
+    <div class="container" id="anaSayfa">
+        <div class="baslik">
+            <h1>🎮 <span>Oyun</span> Önerici</h1>
+            <p>Son 10 yılın en iyi oyunlarını keşfet</p>
+        </div>
+
+        <div class="buton-grubu">
+            <button id="rastgeleBtn" class="btn btn-primary btn-buyuk">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12a8 8 0 0 1 16 0 8 8 0 0 1-16 0z"/>
+                    <path d="M12 8v4l3 3"/>
+                </svg>
+                Bana Oyun Öner
+            </button>
+            <button id="yenileBtn" class="btn btn-secondary btn-buyuk">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6"/>
+                    <path d="M1 20v-6h6"/>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+                Oyunları Yenile
+            </button>
+        </div>
 
         <div class="filtreler">
             <span>Tür:</span>
@@ -477,160 +455,156 @@ body {
         </div>
     </div>
 
+    <!-- ========== MODAL ========== -->
+    <div id="oyunModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="modal-box" style="background: #1a1a2e; max-width: 650px; width: 90%; max-height: 80vh; overflow-y: auto; border-radius: 16px; padding: 25px; position: relative; color: #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+            <button onclick="modalKapat()" style="position: sticky; top: 0; float: right; background: transparent; border: none; color: #fff; font-size: 32px; cursor: pointer; z-index: 10;">&times;</button>
+            <div id="modalIcerik">
+                <p style="color: #888;">Yükleniyor...</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
-// 1️⃣ SUPABASE BAĞLANTISI (DÜZELTİLDİ)
-// ============================================================
-const SUPABASE_URL = "https://erlkkobrxrmdmcihzqjz.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-console.log('✅ Supabase bağlandı, URL:', SUPABASE_URL);
+        // 1️⃣ SUPABASE BAĞLANTISI
+        // ============================================================
+        const SUPABASE_URL = "https://erlkkobrxrmdmcihzqjz.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase bağlandı, URL:', SUPABASE_URL);
 
         // ============================================================
-        // 2️⃣ RAWG API ANAHTARI (BURAYA KENDİ ANAHTARINI YAZ!)
+        // 2️⃣ KULLANICI ID (Supabase Auth'den gelecek)
         // ============================================================
-        const RAWG_API_KEY = "a432df797ae84cafab5abae0c270d5c4"; // <--- BURAYI DEĞİŞTİR!
+        let kullaniciId = localStorage.getItem('kullaniciId') || 'guest';
 
-       // ============================================================
-// 2️⃣ KULLANICI ID (Supabase Auth'den gelecek)
-// ============================================================
-let kullaniciId = localStorage.getItem('kullaniciId') || 'guest';
+        // ============================================================
+        // 3️⃣ RAWG API ANAHTARI
+        // ============================================================
+        const RAWG_API_KEY = "7b6d1d5b02e84f1f9bcfc3e834537c7b";
 
-// ============================================================
-// 4️⃣ OYUNLARI API'DEN ÇEK (Son 10 yıl, kaliteli oyunlar)
-// ============================================================
-async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
-    // Son 10 yılın oyunları (2016-2026)
-    const bugun = new Date();
-    const onYilOnce = new Date();
-    onYilOnce.setFullYear(bugun.getFullYear() - 10);
-    
-    const baslangic = onYilOnce.toISOString().split('T')[0]; // 2016-01-01
-    const bitis = bugun.toISOString().split('T')[0];        // 2026-07-26
-    
-    // Metacritic 70+ (kaliteli oyunlar)
-    const url =
-    `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&dates=${baslangic},${bitis}&metacritic=60,100&ordering=-metacritic&page_size=40&page=${sayfa}`;
+        // ============================================================
+        // 4️⃣ OYUNLARI API'DEN ÇEK (Son 10 yıl, kaliteli oyunlar)
+        // ============================================================
+        async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
+            const bugun = new Date();
+            const onYilOnce = new Date();
+            onYilOnce.setFullYear(bugun.getFullYear() - 10);
+            const baslangic = onYilOnce.toISOString().split('T')[0];
+            const bitis = bugun.toISOString().split('T')[0];
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
+            const url =
+                `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&dates=${baslangic},${bitis}&metacritic=70,100&ordering=-metacritic&page_size=40&page=${sayfa}`;
 
-        if (!data.results || data.results.length === 0) {
-            console.log('📦 Tüm oyunlar yüklendi! Toplam:', toplamOyunlar.length);
-            return toplamOyunlar;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (!data.results || data.results.length === 0) {
+                    console.log('📦 Tüm oyunlar yüklendi! Toplam:', toplamOyunlar.length);
+                    return toplamOyunlar;
+                }
+
+                const yeniOyunlar = data.results.map(game => ({
+                    id: game.id,
+                    isim: game.name,
+                    tur: game.genres?.map(g => g.name).join(', ') || 'Bilinmiyor',
+                    tur_slug: game.genres?.map(g => g.slug).join(', ') || '',
+                    aciklama: game.description_raw || 'Açıklama yok',
+                    resim_url: game.background_image || '',
+                    cikis_yili: game.released ? game.released.split('-')[0] : 'Bilinmiyor',
+                    gelistirici: game.developers?.map(d => d.name).join(', ') || 'Bilinmiyor',
+                    puan: game.rating ? game.rating.toFixed(1) : '?',
+                    metacritic: game.metacritic || '?',
+                    platformlar: game.platforms?.map(p => p.platform.name).slice(0, 3).join(', ') || 'Bilinmiyor',
+                    web_sitesi: game.website || ''
+                }));
+
+                const hepsi = [...toplamOyunlar, ...yeniOyunlar];
+
+                if (hepsi.length >= 500) {
+                    console.log('📦 500 oyuna ulaşıldı, durduruluyor.');
+                    return hepsi;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 300));
+                return oyunlariGetir(sayfa + 1, hepsi);
+
+            } catch (error) {
+                console.error('❌ API çağrısı başarısız:', error);
+                return toplamOyunlar.length > 0 ? toplamOyunlar : [];
+            }
         }
-
-        const yeniOyunlar = data.results.map(game => ({
-            id: game.id,
-            isim: game.name,
-            tur: game.genres?.map(g => g.name).join(', ') || 'Bilinmiyor',
-            tur_slug: game.genres?.map(g => g.slug).join(', ') || '',
-            aciklama: game.description_raw || 'Açıklama yok',
-            resim_url: game.background_image || '',
-            cikis_yili: game.released ? game.released.split('-')[0] : 'Bilinmiyor',
-            gelistirici: game.developers?.map(d => d.name).join(', ') || 'Bilinmiyor',
-            puan: game.rating ? game.rating.toFixed(1) : '?',
-            metacritic: game.metacritic || '?',
-            platformlar: game.platforms?.map(p => p.platform.name).slice(0, 3).join(', ') || 'Bilinmiyor',
-            web_sitesi: game.website || ''
-        }));
-
-        const hepsi = [...toplamOyunlar, ...yeniOyunlar];
-
-        // 500 oyuna ulaştıysak dur
-        if (hepsi.length >= 500) {
-    console.log('📦 500 oyuna ulaşıldı, durduruluyor.');
-    return hepsi;
-}
-
-        // 0.3 saniye bekle, sonraki sayfayı getir
-        await new Promise(resolve => setTimeout(resolve, 300));
-        return oyunlariGetir(sayfa + 1, hepsi);
-
-    } catch (error) {
-        console.error('❌ API çağrısı başarısız:', error);
-        return toplamOyunlar.length > 0 ? toplamOyunlar : [];
-    }
-}
 
         // ============================================================
         // 5️⃣ VERİTABANI FONKSİYONLARI
         // ============================================================
-       async function oynananlariGetir() {
-    console.log('🔍 Oynananlar getiriliyor, kullanıcı:', kullaniciId);
-    
-    const { data, error } = await supabase
-        .from('oynananlar')
-        .select('oyun_id')
-        .eq('kullanici_id', kullaniciId);
-        
-    if (error) {
-        console.error('❌ Oynananlar hatası:', error);
-        return [];
-    }
-    
-    console.log('📋 Oynananlar verisi:', data);
-    return data.map(item => item.oyun_id);
-}
+        async function oynananlariGetir() {
+            console.log('🔍 Oynananlar getiriliyor, kullanıcı:', kullaniciId);
+            try {
+                const { data, error } = await supabase
+                    .from('oynananlar')
+                    .select('oyun_id')
+                    .eq('kullanici_id', kullaniciId);
+
+                if (error) {
+                    console.error('❌ Oynananlar hatası:', error);
+                    return [];
+                }
+                console.log('📋 Oynananlar verisi:', data);
+                return data.map(item => item.oyun_id);
+            } catch (err) {
+                console.error('❌ Beklenmeyen hata:', err);
+                return [];
+            }
+        }
 
         // ============================================================
         // 6️⃣ ANA FONKSİYONLAR
         // ============================================================
         let tumOyunlar = [];
 
-    // ============================================================
-// OYUNLARI YENİLE (Güvenli - Sadece 1 kez yükler)
-// ============================================================
-async function oyunlariYenile() {
-    const sonucDiv = document.getElementById('sonuc');
-    const yenileBtn = document.getElementById('yenileBtn');
-    
-    // Zaten oyunlar yüklüyse uyarı ver
-    if (tumOyunlar.length > 0) {
-        sonucDiv.innerHTML = `<p class="basari-mesaji">✅ Zaten ${tumOyunlar.length} oyun yüklü! Tekrar yüklemeye gerek yok.</p>`;
-        return;
-    }
-    
-    // Butonu devre dışı bırak (çift tıklamayı engelle)
-yenileBtn.disabled = true;
-yenileBtn.innerHTML = `
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
-        <path d="M23 4v6h-6"/>
-        <path d="M1 20v-6h6"/>
-        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-    </svg>
-    Yükleniyor...
-`;
-    
-    sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Son 10 yılın en iyi oyunları yükleniyor (500 oyuna kadar)...</p>';
+        async function oyunlariYenile() {
+            const sonucDiv = document.getElementById('sonuc');
+            const yenileBtn = document.getElementById('yenileBtn');
 
-    try {
-        tumOyunlar = await oyunlariGetir(1, []);
-    } catch (error) {
-        console.error('Yükleme hatası:', error);
-        sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Yükleme sırasında hata oluştu. Lütfen sayfayı yenileyin.</p>';
-        yenileBtn.disabled = false;
-        yenileBtn.style.opacity = '1';
-        yenileBtn.textContent = '🔄 Oyunları Yenile';
-        return;
-    }
+            if (tumOyunlar.length > 0) {
+                sonucDiv.innerHTML = `<p class="basari-mesaji">✅ Zaten ${tumOyunlar.length} oyun yüklü! Tekrar yüklemeye gerek yok.</p>`;
+                return;
+            }
 
-    if (tumOyunlar.length === 0) {
-        sonucDiv.innerHTML = '<p class="hata-mesaji">❌ API\'den oyun gelmedi! Anahtarını kontrol et.</p>';
-    } else {
-        sonucDiv.innerHTML = `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi! (Son 10 yıl, Metacritic 70+)</p>`;
-        console.log('📦 Yüklenen toplam oyun:', tumOyunlar.length);
-    }
-    
-    // Butonu tekrar aktif et
-    yenileBtn.disabled = false;
-    yenileBtn.style.opacity = '1';
-    yenileBtn.textContent = '🔄 Oyunları Yenile';
-    
-    await oynananListesiniGuncelle();
-}
+            yenileBtn.disabled = true;
+            yenileBtn.innerHTML =
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Yükleniyor...`;
+
+            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Son 10 yılın en iyi oyunları yükleniyor (500 oyuna kadar)...</p>';
+
+            try {
+                tumOyunlar = await oyunlariGetir(1, []);
+            } catch (error) {
+                console.error('Yükleme hatası:', error);
+                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Yükleme sırasında hata oluştu.</p>';
+                yenileBtn.disabled = false;
+                yenileBtn.innerHTML =
+                    `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Oyunları Yenile`;
+                return;
+            }
+
+            if (tumOyunlar.length === 0) {
+                sonucDiv.innerHTML = '<p class="hata-mesaji">❌ API\'den oyun gelmedi! Anahtarını kontrol et.</p>';
+            } else {
+                sonucDiv.innerHTML =
+                    `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi! (Son 10 yıl, Metacritic 70+)</p>`;
+                console.log('📦 Yüklenen toplam oyun:', tumOyunlar.length);
+            }
+
+            yenileBtn.disabled = false;
+            yenileBtn.innerHTML =
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Oyunları Yenile`;
+
+            await oynananListesiniGuncelle();
+        }
 
         async function rastgeleOner() {
             const sonucDiv = document.getElementById('sonuc');
@@ -655,85 +629,82 @@ yenileBtn.innerHTML = `
         }
 
         function oyunGoster(oyun) {
-    const resimHtml = oyun.resim_url ?
-        `<img src="${oyun.resim_url}" alt="${oyun.isim}" class="oyun-resim" />` :
-        `<div class="oyun-resim" style="display:flex;align-items:center;justify-content:center;color:#888;">📷 Yok</div>`;
+            const resimHtml = oyun.resim_url ?
+                `<img src="${oyun.resim_url}" alt="${oyun.isim}" class="oyun-resim" />` :
+                `<div class="oyun-resim" style="display:flex;align-items:center;justify-content:center;color:#888;">📷 Yok</div>`;
 
-    document.getElementById('sonuc').innerHTML = `
-        <div class="oyun-karti" onclick="modalAc(${JSON.stringify(oyun).replace(/"/g, '&quot;')})" style="cursor:pointer;">
-            ${resimHtml}
-            <div class="oyun-bilgi">
-                <h3>${oyun.isim}</h3>
-                <div class="oyun-detaylari">
-                    <span class="detay-etiketi">📅 ${oyun.cikis_yili}</span>
-                    <span class="detay-etiketi">⭐ ${oyun.puan}</span>
-                    <span class="detay-etiketi">🎯 ${oyun.metacritic}</span>
-                    <span class="detay-etiketi">🛠️ ${oyun.gelistirici}</span>
+            document.getElementById('sonuc').innerHTML = `
+                <div class="oyun-karti" onclick="modalAc(${JSON.stringify(oyun).replace(/"/g, '&quot;')})" style="cursor:pointer;">
+                    ${resimHtml}
+                    <div class="oyun-bilgi">
+                        <h3>${oyun.isim}</h3>
+                        <div class="oyun-detaylari">
+                            <span class="detay-etiketi">📅 ${oyun.cikis_yili}</span>
+                            <span class="detay-etiketi">⭐ ${oyun.puan}</span>
+                            <span class="detay-etiketi">🎯 Metacritic: ${oyun.metacritic}</span>
+                            <span class="detay-etiketi">🛠️ ${oyun.gelistirici}</span>
+                            <span class="detay-etiketi">📱 ${oyun.platformlar}</span>
+                        </div>
+                        <p>${oyun.aciklama ? oyun.aciklama.substring(0, 250) + '...' : 'Açıklama yok'}</p>
+                        <span class="tur-etiketi">🎮 ${oyun.tur}</span>
+                        <div class="oyun-aksiyon">
+                            <button class="oynadim-btn" onclick="event.stopPropagation(); oynadimEkle(${oyun.id})">✅ Oynadım</button>
+                            <span style="color:#6c5ce7;font-size:13px;margin-left:8px;">👆 Detaylar için tıkla</span>
+                        </div>
+                    </div>
                 </div>
-                <p>${oyun.aciklama ? oyun.aciklama.substring(0, 150) + '...' : 'Açıklama yok'}</p>
-                <span class="tur-etiketi">🎮 ${oyun.tur}</span>
-                <div style="margin-top:8px;">
-                    <button class="oynadim-btn" onclick="event.stopPropagation(); oynadimEkle(${oyun.id})">✅ Oynadım</button>
-                    <span style="color:#6c5ce7;font-size:13px;margin-left:12px;">👆 Detaylar için tıkla</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
+            `;
+        }
 
-      async function oynadimEkle(oyunId) {
-    console.log('➕ Oyun ekleniyor, ID:', oyunId);
-    
-    const { error } = await supabase
-        .from('oynananlar')
-        .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
+        async function oynadimEkle(oyunId) {
+            console.log('➕ Oyun ekleniyor, ID:', oyunId);
 
-    if (error) {
-        console.error('❌ Ekleme hatası:', error);
-        alert('❌ Hata: ' + error.message);
-        return;
-    }
+            const { error } = await supabase
+                .from('oynananlar')
+                .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
 
-    console.log('✅ Oyun başarıyla eklendi!');
-    document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! 🎲</p>';
-    
-    // Listeyi güncelle
-    await oynananListesiniGuncelle();
-    
-    // Modal'ı kapat (eğer açıksa)
-    modalKapat();
-}
-       async function oynananListesiniGuncelle() {
-    console.log('🔄 Oynanan listesi güncelleniyor...');
-    
-    const oynananlar = await oynananlariGetir();
-    console.log('📋 Oynanan ID\'ler:', oynananlar);
-    
-    // Eğer oyunlar yüklenmemişse, bekle
-    if (tumOyunlar.length === 0) {
-        console.log('⚠️ Oyunlar henüz yüklenmemiş, yeniden yükleniyor...');
-        await oyunlariYenile();
-    }
-    
-    const isimler = tumOyunlar
-        .filter(o => oynananlar.includes(o.id))
-        .map(o => o.isim);
-    
-    console.log('📋 Oynanan oyun isimleri:', isimler);
+            if (error) {
+                console.error('❌ Ekleme hatası:', error);
+                alert('❌ Hata: ' + error.message);
+                return;
+            }
 
-    const container = document.getElementById('oynananListesi');
-    if (!container) {
-        console.error('❌ Oynanan listesi HTML elementi bulunamadı!');
-        return;
-    }
-    
-    if (isimler.length === 0) {
-        container.innerHTML = '<span style="color:#888;">Henüz oyun oynamadın.</span>';
-    } else {
-        container.innerHTML = isimler.map(isim => `<span>✅ ${isim}</span>`).join('');
-    }
-    console.log('✅ Liste güncellendi!');
-}
+            console.log('✅ Oyun başarıyla eklendi!');
+            document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! 🎲</p>';
+            await oynananListesiniGuncelle();
+            modalKapat();
+        }
+
+        async function oynananListesiniGuncelle() {
+            console.log('🔄 Oynanan listesi güncelleniyor...');
+
+            const oynananlar = await oynananlariGetir();
+            console.log('📋 Oynanan ID\'ler:', oynananlar);
+
+            if (tumOyunlar.length === 0) {
+                console.log('⚠️ Oyunlar henüz yüklenmemiş, yeniden yükleniyor...');
+                await oyunlariYenile();
+            }
+
+            const isimler = tumOyunlar
+                .filter(o => oynananlar.includes(o.id))
+                .map(o => o.isim);
+
+            console.log('📋 Oynanan oyun isimleri:', isimler);
+
+            const container = document.getElementById('oynananListesi');
+            if (!container) {
+                console.error('❌ Oynanan listesi HTML elementi bulunamadı!');
+                return;
+            }
+
+            if (isimler.length === 0) {
+                container.innerHTML = '<span style="color:#888;">Henüz oyun oynamadın.</span>';
+            } else {
+                container.innerHTML = isimler.map(isim => `<span>✅ ${isim}</span>`).join('');
+            }
+            console.log('✅ Liste güncellendi!');
+        }
 
         async function filtrele(tur) {
             const sonucDiv = document.getElementById('sonuc');
@@ -767,232 +738,243 @@ yenileBtn.innerHTML = `
                     `<img src="${o.resim_url}" alt="${o.isim}" style="width:150px;height:90px;object-fit:cover;border-radius:8px;background:#2d2d4a;" />` :
                     '';
                 html += `
-                        <div class="oyun-karti" style="gap:12px;">
-                            ${resimHtml}
-                            <div class="oyun-bilgi">
-                                <h3 style="font-size:18px;">${o.isim}</h3>
-                                <div class="oyun-detaylari">
-                                    <span class="detay-etiketi">📅 ${o.cikis_yili}</span>
-                                    <span class="detay-etiketi">⭐ ${o.puan}</span>
-                                    <span class="detay-etiketi">${o.gelistirici}</span>
-                                </div>
-                                <span class="tur-etiketi">${o.tur}</span>
-                                <div>
-                                    <button class="oynadim-btn" onclick="oynadimEkle(${o.id})">✅ Oynadım</button>
-                                </div>
+                    <div class="oyun-karti" style="gap:12px;">
+                        ${resimHtml}
+                        <div class="oyun-bilgi">
+                            <h3 style="font-size:18px;">${o.isim}</h3>
+                            <div class="oyun-detaylari">
+                                <span class="detay-etiketi">📅 ${o.cikis_yili}</span>
+                                <span class="detay-etiketi">⭐ ${o.puan}</span>
+                                <span class="detay-etiketi">${o.gelistirici}</span>
+                            </div>
+                            <span class="tur-etiketi">${o.tur}</span>
+                            <div class="oyun-aksiyon">
+                                <button class="oynadim-btn" onclick="event.stopPropagation(); oynadimEkle(${o.id})">✅ Oynadım</button>
                             </div>
                         </div>
-                    `;
+                    </div>
+                `;
             });
             sonucDiv.innerHTML = html;
         }
 
         // ============================================================
-        // 7️⃣ SAYFA YÜKLENİNCE
+        // 7️⃣ MODAL FONKSİYONLARI
+        // ============================================================
+        function modalAc(oyun) {
+            console.log('Modal açılıyor:', oyun.isim);
+
+            const modal = document.getElementById('oyunModal');
+            const icerik = document.getElementById('modalIcerik');
+
+            if (!modal || !icerik) {
+                console.error('❌ Modal veya içerik elementi bulunamadı!');
+                return;
+            }
+
+            const resimHtml = oyun.resim_url ?
+                `<img src="${oyun.resim_url}" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-bottom:12px;" />` :
+                '';
+
+            const turler = oyun.tur ? oyun.tur.split(',').map(t =>
+                `<span class="tur-etiketi">${t.trim()}</span>`
+            ).join('') : '';
+
+            icerik.innerHTML = `
+                <h2 style="margin-top:0;">${oyun.isim}</h2>
+                ${resimHtml}
+                <div style="margin:12px 0;">${turler}</div>
+                <p><strong>📅 Çıkış Tarihi:</strong> ${oyun.cikis_yili || 'Bilinmiyor'}</p>
+                <p><strong>🛠️ Geliştirici:</strong> ${oyun.gelistirici || 'Bilinmiyor'}</p>
+                <p><strong>📱 Platformlar:</strong> ${oyun.platformlar || 'Bilinmiyor'}</p>
+                <p><strong>⭐ Puan:</strong> ${oyun.puan || '?'} / 5</p>
+                <p><strong>🎯 Metacritic:</strong> ${oyun.metacritic || '?'}</p>
+                <p style="margin:16px 0;line-height:1.6;color:#ccc;">${oyun.aciklama || 'Açıklama yok.'}</p>
+                <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;">
+                    <button class="oynadim-btn" onclick="oynadimEkle(${oyun.id}); modalKapat();">✅ Oynadım</button>
+                    ${oyun.web_sitesi ? `<a href="${oyun.web_sitesi}" target="_blank" style="background:#6c5ce7;padding:8px 20px;border-radius:20px;color:white;text-decoration:none;display:inline-block;">🔗 Web Sitesi</a>` : ''}
+                    <button onclick="modalKapat()" style="background:#2d2d4a;padding:8px 20px;border-radius:20px;border:none;color:white;cursor:pointer;">Kapat</button>
+                </div>
+            `;
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function modalKapat() {
+            const modal = document.getElementById('oyunModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // ============================================================
+        // 8️⃣ KULLANICI GİRİŞ SİSTEMİ
+        // ============================================================
+        const authContainer = document.getElementById('authContainer');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+
+        if (showRegister) {
+            showRegister.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            });
+        }
+        if (showLogin) {
+            showLogin.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            });
+        }
+
+        if (loginBtn) {
+            loginBtn.addEventListener('click', async function() {
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value.trim();
+
+                if (!email || !password) {
+                    alert('E-posta ve şifre girmelisiniz!');
+                    return;
+                }
+
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    alert('Giriş başarısız: ' + error.message);
+                    return;
+                }
+
+                console.log('✅ Giriş başarılı!', data);
+                kullaniciId = data.user.id;
+                localStorage.setItem('kullaniciId', kullaniciId);
+                if (authContainer) authContainer.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                oyunlariYenile();
+                oynananListesiniGuncelle();
+            });
+        }
+
+        if (registerBtn) {
+            registerBtn.addEventListener('click', async function() {
+                const email = document.getElementById('registerEmail').value.trim();
+                const password = document.getElementById('registerPassword').value.trim();
+
+                if (!email || !password) {
+                    alert('E-posta ve şifre girmelisiniz!');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    alert('Şifre en az 6 karakter olmalıdır!');
+                    return;
+                }
+
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    alert('Kayıt başarısız: ' + error.message);
+                    return;
+                }
+
+                alert('✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                document.getElementById('loginEmail').value = email;
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+            });
+        }
+
+        async function oturumKontrol() {
+            if (!authContainer) {
+                console.error('❌ authContainer bulunamadı!');
+                return;
+            }
+
+            const { data: { session }, error } = await supabase.auth.getSession();
+
+            if (session) {
+                console.log('✅ Oturum var:', session.user.id);
+                kullaniciId = session.user.id;
+                localStorage.setItem('kullaniciId', kullaniciId);
+                authContainer.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                oyunlariYenile();
+                oynananListesiniGuncelle();
+            } else {
+                console.log('❌ Oturum yok, giriş yapılması gerekiyor.');
+                authContainer.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // ============================================================
+        // 9️⃣ SAYFA YÜKLENİNCE
         // ============================================================
         window.onload = function() {
             console.log('🚀 Sayfa yüklendi!');
-            oturumKontrol();
+
+            // Modal dışı tıklama
+            const modal = document.getElementById('oyunModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) modalKapat();
+                });
+            }
+
+            // ESC tuşu ile kapat
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') modalKapat();
+            });
+
             try {
-        oturumKontrol();
-    } catch (error) {
-        console.error('❌ Oturum kontrolü hatası:', error);
-    }
-            document.getElementById('rastgeleBtn').addEventListener('click', rastgeleOner);
-            document.getElementById('yenileBtn').addEventListener('click', oyunlariYenile);
+                oturumKontrol();
+            } catch (error) {
+                console.error('❌ Oturum kontrolü hatası:', error);
+            }
+
+            const rastgeleBtn = document.getElementById('rastgeleBtn');
+            if (rastgeleBtn) {
+                rastgeleBtn.addEventListener('click', rastgeleOner);
+            }
+
+            const yenileBtn = document.getElementById('yenileBtn');
+            if (yenileBtn) {
+                yenileBtn.addEventListener('click', oyunlariYenile);
+            }
 
             document.querySelectorAll('.filtre-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     filtrele(this.dataset.tur);
                 });
             });
-
-            // Sayfa açılır açılmaz oyunları yükle
-            //oyunlariYenile();
-            oynananListesiniGuncelle();
         };
 
         // ============================================================
-        // 8️⃣ GLOBAL
+        // 🔟 GLOBAL FONKSİYONLAR
         // ============================================================
         window.rastgeleOner = rastgeleOner;
         window.filtrele = filtrele;
         window.oynadimEkle = oynadimEkle;
         window.oyunlariYenile = oyunlariYenile;
-
-        // ============================================================
-// 🔐 KULLANICI GİRİŞ SİSTEMİ
-// ============================================================
-
-// DOM elementlerini seç
-const authContainer = document.getElementById('authContainer');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const showRegister = document.getElementById('showRegister');
-const showLogin = document.getElementById('showLogin');
-const loginEmail = document.getElementById('loginEmail');
-const loginPassword = document.getElementById('loginPassword');
-const registerEmail = document.getElementById('registerEmail');
-const registerPassword = document.getElementById('registerPassword');
-
-// Formlar arası geçiş
-showRegister.addEventListener('click', function(e) {
-    e.preventDefault();
-    loginForm.style.display = 'none';
-    registerForm.style.display = 'block';
-});
-showLogin.addEventListener('click', function(e) {
-    e.preventDefault();
-    loginForm.style.display = 'block';
-    registerForm.style.display = 'none';
-});
-
-// Giriş yap
-loginBtn.addEventListener('click', async function() {
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value.trim();
-    
-    if (!email || !password) {
-        alert('E-posta ve şifre girmelisiniz!');
-        return;
-    }
-    
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-    });
-    
-    if (error) {
-        alert('Giriş başarısız: ' + error.message);
-        return;
-    }
-    
-    console.log('✅ Giriş başarılı!', data);
-    kullaniciId = data.user.id;
-    localStorage.setItem('kullaniciId', kullaniciId);
-    authContainer.style.display = 'none';
-    document.body.style.overflow = 'auto';
-    oyunlariYenile();
-    oynananListesiniGuncelle();
-});
-
-// Kayıt ol
-registerBtn.addEventListener('click', async function() {
-    const email = registerEmail.value.trim();
-    const password = registerPassword.value.trim();
-    
-    if (!email || !password) {
-        alert('E-posta ve şifre girmelisiniz!');
-        return;
-    }
-    
-    if (password.length < 6) {
-        alert('Şifre en az 6 karakter olmalıdır!');
-        return;
-    }
-    
-    const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password
-    });
-    
-    if (error) {
-        alert('Kayıt başarısız: ' + error.message);
-        return;
-    }
-    
-    alert('✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
-    loginForm.style.display = 'block';
-    registerForm.style.display = 'none';
-    loginEmail.value = email;
-    loginPassword.value = '';
-    registerEmail.value = '';
-    registerPassword.value = '';
-});
-
-// Oturum kontrolü (sayfa yenilendiğinde)
-async function oturumKontrol() {
-    const authContainer = document.getElementById('authContainer');
-    if (!authContainer) {
-        console.error('❌ authContainer bulunamadı!');
-        return;
-    }
-    
-    const { data: { session }, error } = await supabase.auth.getSession();
-    
-    if (session) {
-        console.log('✅ Oturum var:', session.user.id);
-        kullaniciId = session.user.id;
-        localStorage.setItem('kullaniciId', kullaniciId);
-        authContainer.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        oyunlariYenile();
-        oynananListesiniGuncelle();
-    } else {
-        console.log('❌ Oturum yok, giriş yapılması gerekiyor.');
-        authContainer.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-// ========== MODAL FONKSİYONLARI (BASİT) ==========
-
-function modalAc(oyun) {
-    console.log('Modal açılıyor:', oyun.isim); // Konsolda kontrol et
-    
-    const modal = document.getElementById('oyunModal');
-    const icerik = document.getElementById('modalIcerik');
-    
-    // Basit içerik
-    icerik.innerHTML = `
-        <h2 style="margin-top:0;color:#fff;">${oyun.isim}</h2>
-        ${oyun.resim_url ? `<img src="${oyun.resim_url}" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-bottom:12px;" />` : ''}
-        <p><strong>🎮 Tür:</strong> ${oyun.tur || 'Bilinmiyor'}</p>
-        <p><strong>📅 Yıl:</strong> ${oyun.cikis_yili || 'Bilinmiyor'}</p>
-        <p><strong>⭐ Puan:</strong> ${oyun.puan || '?'}</p>
-        <p><strong>🛠️ Geliştirici:</strong> ${oyun.gelistirici || 'Bilinmiyor'}</p>
-        <p><strong>📱 Platform:</strong> ${oyun.platformlar || 'Bilinmiyor'}</p>
-        <p style="margin-top:12px;line-height:1.6;color:#ccc;">${oyun.aciklama || 'Açıklama yok.'}</p>
-        <div style="margin-top:16px;">
-            <button class="oynadim-btn" onclick="oynadimEkle(${oyun.id}); modalKapat();">✅ Oynadım</button>
-            ${oyun.web_sitesi ? `<a href="${oyun.web_sitesi}" target="_blank" style="background:#6c5ce7;padding:8px 20px;border-radius:20px;color:white;text-decoration:none;display:inline-block;margin-left:8px;">🔗 Web Sitesi</a>` : ''}
-            <button onclick="modalKapat()" style="background:#2d2d4a;padding:8px 20px;border-radius:20px;border:none;color:white;cursor:pointer;margin-left:8px;">Kapat</button>
-        </div>
-    `;
-    
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-
-function modalKapat() {
-    document.getElementById('oyunModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-function modalKapat() {
-    const modal = document.getElementById('oyunModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    } else {
-        console.warn('Modal bulunamadı, kapatılamadı.');
-    }
-}
-
-        
+        window.modalAc = modalAc;
+        window.modalKapat = modalKapat;
     </script>
 
-   <!-- ========== MODAL ========== -->
-<div id="oyunModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center;">
-    <div style="background: #1a1a2e; max-width: 650px; width: 90%; max-height: 80vh; overflow-y: auto; border-radius: 16px; padding: 25px; position: relative; color: #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
-        <button onclick="modalKapat()" style="position: sticky; top: 0; float: right; background: transparent; border: none; color: #fff; font-size: 32px; cursor: pointer; z-index: 10;">&times;</button>
-        <div id="modalIcerik">
-            <p style="color: #888;">Yükleniyor...</p>
-        </div>
-    </div>
-</div>
-</body>
 </body>
 </html>
