@@ -495,7 +495,7 @@
             const bitis = bugun.toISOString().split('T')[0];
 
            const url =
-    `https://api.rawg.io/api/games?dates=${baslangic},${bitis}&metacritic=70,100&ordering=-metacritic&page_size=40&page=${sayfa}&key=${RAWG_API_KEY}`;
+    `https://cors-anywhere.herokuapp.com/https://api.rawg.io/api/games?dates=${baslangic},${bitis}&metacritic=70,100&ordering=-metacritic&page_size=40&page=${sayfa}&key=${RAWG_API_KEY}`;
 
             try {
                 const response = await fetch(url);
