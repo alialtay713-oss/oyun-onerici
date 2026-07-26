@@ -354,19 +354,48 @@ async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
         // ============================================================
         let tumOyunlar = [];
 
-      async function oyunlariYenile() {
+    // ============================================================
+// OYUNLARI YENİLE (Güvenli - Sadece 1 kez yükler)
+// ============================================================
+async function oyunlariYenile() {
     const sonucDiv = document.getElementById('sonuc');
+    const yenileBtn = document.getElementById('yenileBtn');
+    
+    // Zaten oyunlar yüklüyse uyarı ver
+    if (tumOyunlar.length > 0) {
+        sonucDiv.innerHTML = `<p class="basari-mesaji">✅ Zaten ${tumOyunlar.length} oyun yüklü! Tekrar yüklemeye gerek yok.</p>`;
+        return;
+    }
+    
+    // Butonu devre dışı bırak (çift tıklamayı engelle)
+    yenileBtn.disabled = true;
+    yenileBtn.style.opacity = '0.5';
+    yenileBtn.textContent = '⏳ Yükleniyor...';
+    
     sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Son 10 yılın en iyi oyunları yükleniyor (250 oyuna kadar)...</p>';
 
-    tumOyunlar = await oyunlariGetir(1, []);
-
-    if (tumOyunlar.length === 0) {
-        sonucDiv.innerHTML = '<p class="hata-mesaji">❌ API\'den oyun gelmedi! Anahtarını kontrol et.</p>';
+    try {
+        tumOyunlar = await oyunlariGetir(1, []);
+    } catch (error) {
+        console.error('Yükleme hatası:', error);
+        sonucDiv.innerHTML = '<p class="hata-mesaji">❌ Yükleme sırasında hata oluştu. Lütfen sayfayı yenileyin.</p>';
+        yenileBtn.disabled = false;
+        yenileBtn.style.opacity = '1';
+        yenileBtn.textContent = '🔄 Oyunları Yenile';
         return;
     }
 
-    sonucDiv.innerHTML = `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi! (Son 10 yıl, Metacritic 70+)</p>`;
-    console.log('📦 Yüklenen toplam oyun:', tumOyunlar.length);
+    if (tumOyunlar.length === 0) {
+        sonucDiv.innerHTML = '<p class="hata-mesaji">❌ API\'den oyun gelmedi! Anahtarını kontrol et.</p>';
+    } else {
+        sonucDiv.innerHTML = `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi! (Son 10 yıl, Metacritic 70+)</p>`;
+        console.log('📦 Yüklenen toplam oyun:', tumOyunlar.length);
+    }
+    
+    // Butonu tekrar aktif et
+    yenileBtn.disabled = false;
+    yenileBtn.style.opacity = '1';
+    yenileBtn.textContent = '🔄 Oyunları Yenile';
     
     await oynananListesiniGuncelle();
 }
@@ -516,7 +545,7 @@ async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
             });
 
             // Sayfa açılır açılmaz oyunları yükle
-            oyunlariYenile();
+            //oyunlariYenile();
             oynananListesiniGuncelle();
         };
 
