@@ -492,15 +492,10 @@ console.log('✅ Supabase bağlandı, URL:', SUPABASE_URL);
         // ============================================================
         const RAWG_API_KEY = "a432df797ae84cafab5abae0c270d5c4"; // <--- BURAYI DEĞİŞTİR!
 
-        // ============================================================
-        // 3️⃣ KULLANICI ID
-        // ============================================================
-        let kullaniciId = localStorage.getItem('kullaniciId');
-        if (!kullaniciId) {
-            kullaniciId = 'user_' + Math.random().toString(36).slice(2, 10);
-            localStorage.setItem('kullaniciId', kullaniciId);
-        }
-
+       // ============================================================
+// 2️⃣ KULLANICI ID (Supabase Auth'den gelecek)
+// ============================================================
+let kullaniciId = localStorage.getItem('kullaniciId') || 'guest';
 
 // ============================================================
 // 4️⃣ OYUNLARI API'DEN ÇEK (Son 10 yıl, kaliteli oyunlar)
@@ -797,6 +792,7 @@ yenileBtn.innerHTML = `
         // ============================================================
         window.onload = function() {
             console.log('🚀 Sayfa yüklendi!');
+            oturumKontrol();
             document.getElementById('rastgeleBtn').addEventListener('click', rastgeleOner);
             document.getElementById('yenileBtn').addEventListener('click', oyunlariYenile);
 
