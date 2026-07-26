@@ -292,7 +292,7 @@ async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
     
     // Metacritic 70+ (kaliteli oyunlar)
     const url =
-        `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&dates=${baslangic},${bitis}&metacritic=70,100&ordering=-metacritic&page_size=40&page=${sayfa}`;
+    `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&dates=${baslangic},${bitis}&metacritic=60,100&ordering=-metacritic&page_size=40&page=${sayfa}`;
 
     try {
         const response = await fetch(url);
@@ -320,11 +320,11 @@ async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
 
         const hepsi = [...toplamOyunlar, ...yeniOyunlar];
 
-        // 250 oyuna ulaştıysak dur
-        if (hepsi.length >= 250) {
-            console.log('📦 250 oyuna ulaşıldı, durduruluyor.');
-            return hepsi;
-        }
+        // 500 oyuna ulaştıysak dur
+        if (hepsi.length >= 500) {
+    console.log('📦 500 oyuna ulaşıldı, durduruluyor.');
+    return hepsi;
+}
 
         // 0.3 saniye bekle, sonraki sayfayı getir
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -379,7 +379,7 @@ async function oyunlariYenile() {
     yenileBtn.style.opacity = '0.5';
     yenileBtn.textContent = '⏳ Yükleniyor...';
     
-    sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Son 10 yılın en iyi oyunları yükleniyor (250 oyuna kadar)...</p>';
+    sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Son 10 yılın en iyi oyunları yükleniyor (500 oyuna kadar)...</p>';
 
     try {
         tumOyunlar = await oyunlariGetir(1, []);
