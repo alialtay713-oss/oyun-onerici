@@ -535,9 +535,9 @@
 
                 const hepsi = [...toplamOyunlar, ...yeniOyunlar];
 
-                // 500 oyuna ulaştıysak dur
-                if (hepsi.length >= 500) {
-                    console.log('📦 500 oyuna ulaşıldı, durduruluyor.');
+                // 200 oyuna ulaştıysak dur
+                if (hepsi.length >= 200) {
+                    console.log('📦 200 oyuna ulaşıldı, durduruluyor.');
                     return hepsi;
                 }
 
@@ -592,7 +592,7 @@
             yenileBtn.innerHTML =
                 `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Yükleniyor...`;
 
-            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Oyunlar yükleniyor (500 oyuna kadar)...</p>';
+            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Oyunlar yükleniyor (200 oyuna kadar)...</p>';
 
             try {
                 tumOyunlar = await oyunlariGetir(1, []);
