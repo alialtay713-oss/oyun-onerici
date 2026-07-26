@@ -337,17 +337,22 @@ async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
         // ============================================================
         // 5️⃣ VERİTABANI FONKSİYONLARI
         // ============================================================
-        async function oynananlariGetir() {
-            const { data, error } = await supabase
-                .from('oynananlar')
-                .select('oyun_id')
-                .eq('kullanici_id', kullaniciId);
-            if (error) {
-                console.error('Oynananlar hatası:', error);
-                return [];
-            }
-            return data.map(item => item.oyun_id);
-        }
+       async function oynananlariGetir() {
+    console.log('🔍 Oynananlar getiriliyor, kullanıcı:', kullaniciId);
+    
+    const { data, error } = await supabase
+        .from('oynananlar')
+        .select('oyun_id')
+        .eq('kullanici_id', kullaniciId);
+        
+    if (error) {
+        console.error('❌ Oynananlar hatası:', error);
+        return [];
+    }
+    
+    console.log('📋 Oynananlar verisi:', data);
+    return data.map(item => item.oyun_id);
+}
 
         // ============================================================
         // 6️⃣ ANA FONKSİYONLAR
@@ -450,6 +455,8 @@ async function oyunlariYenile() {
 }
 
       async function oynadimEkle(oyunId) {
+    console.log('➕ Oyun ekleniyor, ID:', oyunId);
+    
     const { error } = await supabase
         .from('oynananlar')
         .insert({ kullanici_id: kullaniciId, oyun_id: oyunId });
@@ -460,30 +467,46 @@ async function oyunlariYenile() {
         return;
     }
 
-    console.log('✅ Oyun eklendi, ID:', oyunId);  // <--- Konsola yazdır
-    
+    console.log('✅ Oyun başarıyla eklendi!');
     document.getElementById('sonuc').innerHTML = '<p class="basari-mesaji">✅ Oyun listene eklendi! 🎲</p>';
     
-    // Liste güncellemesini bekle
+    // Listeyi güncelle
     await oynananListesiniGuncelle();
     
-    // Konsolda listeyi kontrol et
-    console.log('📋 Güncel oynananlar:', await oynananlariGetir());
+    // Modal'ı kapat (eğer açıksa)
+    modalKapat();
 }
+       async function oynananListesiniGuncelle() {
+    console.log('🔄 Oynanan listesi güncelleniyor...');
+    
+    const oynananlar = await oynananlariGetir();
+    console.log('📋 Oynanan ID\'ler:', oynananlar);
+    
+    // Eğer oyunlar yüklenmemişse, bekle
+    if (tumOyunlar.length === 0) {
+        console.log('⚠️ Oyunlar henüz yüklenmemiş, yeniden yükleniyor...');
+        await oyunlariYenile();
+    }
+    
+    const isimler = tumOyunlar
+        .filter(o => oynananlar.includes(o.id))
+        .map(o => o.isim);
+    
+    console.log('📋 Oynanan oyun isimleri:', isimler);
 
-        async function oynananListesiniGuncelle() {
-            const oynananlar = await oynananlariGetir();
-            const isimler = tumOyunlar
-                .filter(o => oynananlar.includes(o.id))
-                .map(o => o.isim);
-
-            const container = document.getElementById('oynananListesi');
-            if (isimler.length === 0) {
-                container.innerHTML = '<span style="color:#888;">Henüz oyun oynamadın.</span>';
-            } else {
-                container.innerHTML = isimler.map(isim => `<span>${isim}</span>`).join('');
-            }
-        }
+    const container = document.getElementById('oynananListesi');
+    if (!container) {
+        console.error('❌ Oynanan listesi HTML elementi bulunamadı!');
+        return;
+    }
+    
+    if (isimler.length === 0) {
+        container.innerHTML = '<span style="color:#888;">Henüz oyun oynamadın.</span>';
+    } else {
+        container.innerHTML = isimler.map(isim => `<span>✅ ${isim}</span>`).join('');
+    }
+    console.log('✅ Liste güncellendi!');
+}
 
         async function filtrele(tur) {
             const sonucDiv = document.getElementById('sonuc');
