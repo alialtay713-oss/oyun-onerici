@@ -414,6 +414,13 @@
             <p>Son 10 yılın en iyi oyunlarını keşfet</p>
         </div>
 
+        <!-- Çıkış Butonu -->
+<div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+    <button id="cikisBtn" class="btn btn-secondary" style="padding: 8px 20px; font-size: 0.9rem;">
+        🚪 Çıkış Yap
+    </button>
+</div>
+
         <div class="buton-grubu">
             <button id="rastgeleBtn" class="btn btn-primary btn-buyuk">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -495,7 +502,7 @@
             const bitis = bugun.toISOString().split('T')[0];
 
            const url =
-    `https://cors-anywhere.herokuapp.com/https://api.rawg.io/api/games?dates=${baslangic},${bitis}&metacritic=70,100&ordering=-metacritic&page_size=40&page=${sayfa}&key=${RAWG_API_KEY}`;
+    `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&page_size=40&page=${sayfa}`;
 
             try {
                 const response = await fetch(url);
@@ -816,6 +823,9 @@
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const loginBtn = document.getElementById('loginBtn');
+        // Çıkış butonunu göster
+const cikisBtn = document.getElementById('cikisBtn');
+if (cikisBtn) cikisBtn.style.display = 'inline-flex';
         const registerBtn = document.getElementById('registerBtn');
         const showRegister = document.getElementById('showRegister');
         const showLogin = document.getElementById('showLogin');
@@ -859,6 +869,9 @@
                 kullaniciId = data.user.id;
                 localStorage.setItem('kullaniciId', kullaniciId);
                 if (authContainer) authContainer.style.display = 'none';
+                // Çıkış butonunu göster
+const cikisBtn = document.getElementById('cikisBtn');
+if (cikisBtn) cikisBtn.style.display = 'inline-flex';
                 document.body.style.overflow = 'auto';
                 oyunlariYenile();
                 oynananListesiniGuncelle();
@@ -924,10 +937,44 @@
         }
 
         // ============================================================
+// 🚪 ÇIKIŞ YAP
+// ============================================================
+async function cikisYap() {
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+        alert('❌ Çıkış yaparken hata oluştu: ' + error.message);
+        return;
+    }
+    
+    // Kullanıcı bilgilerini temizle
+    localStorage.removeItem('kullaniciId');
+    kullaniciId = 'guest';
+    
+    // Giriş ekranını göster
+    const authContainer = document.getElementById('authContainer');
+    if (authContainer) {
+        authContainer.style.display = 'flex';
+    }
+    
+    // Ana sayfayı temizle
+    document.getElementById('sonuc').innerHTML = '<p>Çıkış yaptınız. Tekrar giriş yapmak için sayfayı yenileyin.</p>';
+    document.getElementById('oynananListesi').innerHTML = '<span style="color:#888;">Çıkış yaptınız.</span>';
+    
+    console.log('✅ Çıkış yapıldı.');
+}
+
+        // ============================================================
         // 9️⃣ SAYFA YÜKLENİNCE
         // ============================================================
         window.onload = function() {
             console.log('🚀 Sayfa yüklendi!');
+
+            // Çıkış butonu
+const cikisBtn = document.getElementById('cikisBtn');
+if (cikisBtn) {
+    cikisBtn.addEventListener('click', cikisYap);
+}
 
             // Modal dışı tıklama
             const modal = document.getElementById('oyunModal');
