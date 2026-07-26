@@ -793,6 +793,11 @@ yenileBtn.innerHTML = `
         window.onload = function() {
             console.log('🚀 Sayfa yüklendi!');
             oturumKontrol();
+            try {
+        oturumKontrol();
+    } catch (error) {
+        console.error('❌ Oturum kontrolü hatası:', error);
+    }
             document.getElementById('rastgeleBtn').addEventListener('click', rastgeleOner);
             document.getElementById('yenileBtn').addEventListener('click', oyunlariYenile);
 
@@ -909,6 +914,12 @@ registerBtn.addEventListener('click', async function() {
 
 // Oturum kontrolü (sayfa yenilendiğinde)
 async function oturumKontrol() {
+    const authContainer = document.getElementById('authContainer');
+    if (!authContainer) {
+        console.error('❌ authContainer bulunamadı!');
+        return;
+    }
+    
     const { data: { session }, error } = await supabase.auth.getSession();
     
     if (session) {
