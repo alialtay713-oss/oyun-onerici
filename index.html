@@ -7,224 +7,336 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
     </script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: system-ui, sans-serif;
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 20px;
-            background: #0f0f1a;
-            color: #eee;
-        }
-        .container {
-            background: #1a1a2e;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-        }
-        h1 {
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-        button {
-            background: #6c5ce7;
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 30px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 6px 4px;
-            transition: 0.2s;
-        }
-        button:hover {
-            background: #5a4bd1;
-            transform: scale(1.02);
-        }
-        .filtre-btn {
-            background: #2d2d4a;
-            padding: 8px 18px;
-            font-size: 14px;
-        }
-        .filtre-btn:hover {
-            background: #3d3d5c;
-        }
-        .oyun-karti {
-            background: #252541;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 16px 0;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .oyun-resim {
-            width: 200px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            background: #2d2d4a;
-        }
-        .oyun-bilgi {
-            flex: 1;
-            min-width: 200px;
-        }
-        .oyun-bilgi h3 {
-            margin: 0;
-            color: #fff;
-            font-size: 20px;
-        }
-        .oyun-bilgi p {
-            margin: 6px 0;
-            color: #aaa;
-            font-size: 14px;
-        }
-        .detay-etiketi {
-            background: #2d2d4a;
-            padding: 3px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            color: #c7c7e6;
-            display: inline-block;
-            margin: 3px 4px 3px 0;
-        }
-        .tur-etiketi {
-            background: #6c5ce7;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: white;
-            display: inline-block;
-            margin-top: 6px;
-        }
-        .oynadim-btn {
-            background: #00b894;
-            padding: 8px 20px;
-            border-radius: 20px;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        .oynadim-btn:hover {
-            background: #00a381;
-        }
-        #sonuc {
-            min-height: 100px;
-            margin-top: 20px;
-        }
-        #oynananlar {
-            margin-top: 30px;
-            border-top: 1px solid #2d2d4a;
-            padding-top: 20px;
-        }
-        #oynananlar h3 {
-            margin-bottom: 12px;
-        }
-        #oynananListesi span {
-            background: #2d2d4a;
-            padding: 4px 16px;
-            border-radius: 16px;
-            margin: 4px;
-            display: inline-block;
-            font-size: 14px;
-        }
-        .filtreler {
-            margin: 16px 0;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 6px;
-        }
-        .filtreler span {
-            margin-right: 8px;
-            font-weight: bold;
-        }
-        .hata-mesaji {
-            color: #ff6b6b;
-        }
-        .basari-mesaji {
-            color: #00b894;
-        }
-        .yukleniyor {
-            color: #fdcb6e;
-        }
-        .oyun-detaylari {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
-        }
-        /* Modal stilleri */
-#oyunModal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 1000;
-    justify-content: center;
+       /* ========== RESET & GENEL ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e4e4e7;
+    min-height: 100vh;
+    padding: 20px;
+    background-image: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0a0a0f 70%);
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ========== BAŞLIK ========== */
+.baslik {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.baslik h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #6c5ce7, #a855f7, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    letter-spacing: -1px;
+}
+.baslik h1 span {
+    -webkit-text-fill-color: #fff;
+}
+.baslik p {
+    color: #8b8ba3;
+    font-size: 1.1rem;
+    margin-top: 6px;
+}
+
+/* ========== BUTONLAR ========== */
+.btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
     align-items: center;
+    gap: 10px;
 }
-#oyunModal.active {
+.btn-primary {
+    background: linear-gradient(135deg, #6c5ce7, #a855f7);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+}
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
+}
+.btn-secondary {
+    background: #2d2d4a;
+    color: #c7c7e6;
+}
+.btn-secondary:hover {
+    background: #3d3d5c;
+    transform: translateY(-2px);
+}
+.btn-success {
+    background: linear-gradient(135deg, #00b894, #00a381);
+    color: #fff;
+}
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 184, 148, 0.4);
+}
+
+/* ========== FİLTRELER ========== */
+.filtreler {
     display: flex;
-}
-#oyunModal .modal-box {
-    background: #1a1a2e;
-    max-width: 700px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 24px 0;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 16px;
-    padding: 30px;
-    position: relative;
-    color: #eee;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
-#oyunModal .modal-box img {
-    width: 100%;
-    max-height: 250px;
+.filtreler span {
+    font-weight: 600;
+    color: #a5a5c0;
+    margin-right: 8px;
+}
+.filtre-btn {
+    padding: 8px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    background: transparent;
+    color: #a5a5c0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+.filtre-btn:hover {
+    background: rgba(108, 92, 231, 0.15);
+    color: #fff;
+    border-color: #6c5ce7;
+}
+.filtre-btn.aktif {
+    background: #6c5ce7;
+    color: #fff;
+    border-color: #6c5ce7;
+}
+
+/* ========== OYUN KARTI ========== */
+.oyun-karti {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.oyun-karti:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(108, 92, 231, 0.3);
+}
+.oyun-resim {
+    width: 180px;
+    height: 110px;
     object-fit: cover;
     border-radius: 12px;
-    margin-bottom: 16px;
+    flex-shrink: 0;
+    background: #1a1a2e;
 }
-#oyunModal .modal-box .detay {
-    margin: 6px 0;
-    color: #aaa;
-    font-size: 14px;
+.oyun-bilgi {
+    flex: 1;
 }
-#oyunModal .modal-box .detay span {
-    color: #eee;
-    font-weight: bold;
+.oyun-bilgi h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
 }
-#oyunModal .modal-box .tur-etiketi {
-    background: #6c5ce7;
-    padding: 4px 14px;
+.oyun-bilgi p {
+    color: #a5a5c0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.oyun-detaylari {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0;
+}
+.detay-etiketi {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 3px 14px;
     border-radius: 20px;
-    font-size: 13px;
-    color: white;
-    display: inline-block;
-    margin: 4px 4px 4px 0;
+    font-size: 0.75rem;
+    color: #a5a5c0;
 }
-#oyunModal .modal-box .aksiyon-butonlari {
-    margin-top: 16px;
+.tur-etiketi {
+    background: rgba(108, 92, 231, 0.2);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #c4b5fd;
+    display: inline-block;
+    margin-top: 6px;
+}
+.oyun-aksiyon {
     display: flex;
     gap: 10px;
+    margin-top: 12px;
     flex-wrap: wrap;
+}
+.oynadim-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #00b894, #00a381);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.oynadim-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 184, 148, 0.4);
+}
+.oyun-detay-link {
+    color: #8b8ba3;
+    font-size: 0.85rem;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+.oyun-detay-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* ========== OYNADIM LİSTESİ ========== */
+#oynananlar {
+    margin-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 30px;
+}
+#oynananlar h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #fff;
+}
+#oynananListesi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+#oynananListesi span {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    color: #c7c7e6;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ========== MESAJLAR ========== */
+.hata-mesaji {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+    padding: 16px 20px;
+    border-radius: 12px;
+    border-left: 4px solid #f87171;
+}
+.basari-mesaji {
+    color: #6ee7b7;
+    background: rgba(110, 231, 183, 0.1);
+    padding: 16px 20px;
+    border-radius: 12px;
+    border-left: 4px solid #6ee7b7;
+}
+.yukleniyor {
+    color: #fcd34d;
+    background: rgba(252, 211, 77, 0.1);
+    padding: 16px 20px;
+    border-radius: 12px;
+    border-left: 4px solid #fcd34d;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* ========== MODAL ========== */
+#oyunModal .modal-box {
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+}
+#oyunModal .modal-box h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+}
+#oyunModal .modal-box .detay {
+    color: #a5a5c0;
+}
+#oyunModal .modal-box .detay span {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 700px) {
+    .baslik h1 {
+        font-size: 2rem;
+    }
+    .oyun-karti {
+        flex-direction: column;
+    }
+    .oyun-resim {
+        width: 100%;
+        height: 160px;
+    }
+    .filtreler {
+        gap: 6px;
+        padding: 12px;
+    }
+    .filtre-btn {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+    }
+    #oynananListesi span {
+        font-size: 0.8rem;
+        padding: 4px 14px;
+    }
 }
     </style>
 </head>
 <body>
 
- <div class="container">
-    <h1>🎮 Oyun Önerici v1.0</h1>
-  </div>
+<div class="baslik">
+    <h1>🎮 <span>Oyun</span> Önerici</h1>
+    <p>Son 10 yılın en iyi oyunlarını keşfet</p>
+</div>
   <div>
     <button id="rastgeleBtn">🎲 Bana Oyun Öner</button>
     <button id="yenileBtn" style="background:#2d2d4a;">🔄 Oyunları Yenile</button>
