@@ -255,11 +255,13 @@
 
     <script>
         // ============================================================
-        // 1️⃣ SUPABASE BAĞLANTISI
-        // ============================================================
-        const SUPABASE_URL = "https://erlkkobrxrmdmcihzqjz.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// 1️⃣ SUPABASE BAĞLANTISI (DÜZELTİLDİ)
+// ============================================================
+const SUPABASE_URL = "https://erlkkobrxrmdmcihzqjz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_s4YSwBYzhJAU1GISeeqozQ_ZqZ5yWo4";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+console.log('✅ Supabase bağlandı, URL:', SUPABASE_URL);
 
         // ============================================================
         // 2️⃣ RAWG API ANAHTARI (BURAYA KENDİ ANAHTARINI YAZ!)
