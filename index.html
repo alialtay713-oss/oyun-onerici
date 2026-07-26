@@ -284,6 +284,10 @@ body {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
 }
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
 
 /* ========== MODAL ========== */
 #oyunModal .modal-box {
@@ -329,6 +333,73 @@ body {
         padding: 4px 14px;
     }
 }
+/* ========== BUTON GRUBU ========== */
+.buton-grubu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    margin: 16px 0 8px 0;
+}
+
+.btn-buyuk {
+    padding: 14px 34px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: 60px;
+    letter-spacing: 0.3px;
+    gap: 12px;
+}
+
+.btn-buyuk svg {
+    flex-shrink: 0;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #6c5ce7, #a855f7);
+    color: #fff;
+    box-shadow: 0 4px 25px rgba(108, 92, 231, 0.35);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+.btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 40px rgba(108, 92, 231, 0.55);
+}
+.btn-primary:active {
+    transform: scale(0.96);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.06);
+    color: #c7c7e6;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+.btn-secondary:active {
+    transform: scale(0.96);
+}
+
+/* Butonların disabled hali */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    pointer-events: none;
+}
     </style>
 </head>
 <body>
@@ -337,10 +408,23 @@ body {
     <h1>🎮 <span>Oyun</span> Önerici</h1>
     <p>Son 10 yılın en iyi oyunlarını keşfet</p>
 </div>
-  <div>
-    <button id="rastgeleBtn">🎲 Bana Oyun Öner</button>
-    <button id="yenileBtn" style="background:#2d2d4a;">🔄 Oyunları Yenile</button>
-  </div>
+  <div class="buton-grubu">
+    <button id="rastgeleBtn" class="btn btn-primary btn-buyuk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 12a8 8 0 0 1 16 0 8 8 0 0 1-16 0z"/>
+            <path d="M12 8v4l3 3"/>
+        </svg>
+        Bana Oyun Öner
+    </button>
+    <button id="yenileBtn" class="btn btn-secondary btn-buyuk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6"/>
+            <path d="M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        Oyunları Yenile
+    </button>
+</div>
 
         <div class="filtreler">
             <span>Tür:</span>
@@ -487,9 +571,15 @@ async function oyunlariYenile() {
     }
     
     // Butonu devre dışı bırak (çift tıklamayı engelle)
-    yenileBtn.disabled = true;
-    yenileBtn.style.opacity = '0.5';
-    yenileBtn.textContent = '⏳ Yükleniyor...';
+yenileBtn.disabled = true;
+yenileBtn.innerHTML = `
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
+        <path d="M23 4v6h-6"/>
+        <path d="M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+    </svg>
+    Yükleniyor...
+`;
     
     sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Son 10 yılın en iyi oyunları yükleniyor (500 oyuna kadar)...</p>';
 
