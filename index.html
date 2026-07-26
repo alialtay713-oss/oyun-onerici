@@ -275,15 +275,22 @@
             localStorage.setItem('kullaniciId', kullaniciId);
         }
 
-        // ============================================================
-        // 4️⃣ OYUNLARI API'DEN ÇEK
-        // ============================================================
-     // ============================================================
-// 4️⃣ OYUNLARI API'DEN ÇEK (Sayfalama ile 200+ oyun)
+
+// ============================================================
+// 4️⃣ OYUNLARI API'DEN ÇEK (Son 10 yıl, kaliteli oyunlar)
 // ============================================================
 async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
+    // Son 10 yılın oyunları (2016-2026)
+    const bugun = new Date();
+    const onYilOnce = new Date();
+    onYilOnce.setFullYear(bugun.getFullYear() - 10);
+    
+    const baslangic = onYilOnce.toISOString().split('T')[0]; // 2016-01-01
+    const bitis = bugun.toISOString().split('T')[0];        // 2026-07-26
+    
+    // Metacritic 70+ (kaliteli oyunlar)
     const url =
-        `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&ordering=-rating&page_size=40&page=${sayfa}&exclude_additions=true`;
+        `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&dates=${baslangic},${bitis}&metacritic=70,100&ordering=-metacritic&page_size=40&page=${sayfa}`;
 
     try {
         const response = await fetch(url);
@@ -311,14 +318,14 @@ async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
 
         const hepsi = [...toplamOyunlar, ...yeniOyunlar];
 
-        // 200 oyuna ulaştıysak dur (API'yi yormamak için)
-        if (hepsi.length >= 200) {
-            console.log('📦 200 oyuna ulaşıldı, durduruluyor.');
+        // 250 oyuna ulaştıysak dur
+        if (hepsi.length >= 250) {
+            console.log('📦 250 oyuna ulaşıldı, durduruluyor.');
             return hepsi;
         }
 
-        // 0.2 saniye bekle, sonraki sayfayı getir
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // 0.3 saniye bekle, sonraki sayfayı getir
+        await new Promise(resolve => setTimeout(resolve, 300));
         return oyunlariGetir(sayfa + 1, hepsi);
 
     } catch (error) {
@@ -347,9 +354,9 @@ async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
         // ============================================================
         let tumOyunlar = [];
 
-       async function oyunlariYenile() {
+      async function oyunlariYenile() {
     const sonucDiv = document.getElementById('sonuc');
-    sonucDiv.innerHTML = '<p class="yukleniyor">🔄 API\'den oyunlar yükleniyor (200 oyuna kadar)...</p>';
+    sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Son 10 yılın en iyi oyunları yükleniyor (250 oyuna kadar)...</p>';
 
     tumOyunlar = await oyunlariGetir(1, []);
 
@@ -358,10 +365,9 @@ async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
         return;
     }
 
-    sonucDiv.innerHTML = `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi! Şimdi öneri alabilirsin.</p>`;
+    sonucDiv.innerHTML = `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi! (Son 10 yıl, Metacritic 70+)</p>`;
     console.log('📦 Yüklenen toplam oyun:', tumOyunlar.length);
     
-    // Oynanan listesini güncelle
     await oynananListesiniGuncelle();
 }
 
