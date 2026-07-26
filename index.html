@@ -415,11 +415,11 @@
         </div>
 
         <!-- Çıkış Butonu -->
-<div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-    <button id="cikisBtn" class="btn btn-secondary" style="padding: 8px 20px; font-size: 0.9rem;">
-        🚪 Çıkış Yap
-    </button>
-</div>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+            <button id="cikisBtn" class="btn btn-secondary" style="padding: 8px 20px; font-size: 0.9rem; display: none;">
+                🚪 Çıkış Yap
+            </button>
+        </div>
 
         <div class="buton-grubu">
             <button id="rastgeleBtn" class="btn btn-primary btn-buyuk">
@@ -487,33 +487,38 @@
         let kullaniciId = localStorage.getItem('kullaniciId') || 'guest';
 
         // ============================================================
-        // 3️⃣ RAWG API ANAHTARI
+        // 3️⃣ RAWG API ANAHTARI (KENDİ ANAHTARINLA DEĞİŞTİR!)
         // ============================================================
-        const RAWG_API_KEY = "7b6d1d5b02e84f1f9bcfc3e834537c7b";
+        const RAWG_API_KEY = "7b6d1d5b02e84f1f9bcfc3e834537c7b"; // <--- BURAYA KENDİ ANAHTARINI YAZ
 
         // ============================================================
-        // 4️⃣ OYUNLARI API'DEN ÇEK (Son 10 yıl, kaliteli oyunlar)
+        // 4️⃣ OYUNLARI API'DEN ÇEK (CORS Engeli Aşılmış)
         // ============================================================
         async function oyunlariGetir(sayfa = 1, toplamOyunlar = []) {
-            const bugun = new Date();
-            const onYilOnce = new Date();
-            onYilOnce.setFullYear(bugun.getFullYear() - 10);
-            const baslangic = onYilOnce.toISOString().split('T')[0];
-            const bitis = bugun.toISOString().split('T')[0];
-
-           const url =
-    `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&page_size=40&page=${sayfa}`;
+            // CORS'u aşmak için proxy kullan (AllOrigins)
+            const proxyUrl = "https://api.allorigins.win/get?url=";
+            const apiUrl = `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&page_size=40&page=${sayfa}`;
+            const url = proxyUrl + encodeURIComponent(apiUrl);
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
 
-                if (!data.results || data.results.length === 0) {
+                // AllOrigins'ten gelen veriyi parse et
+                if (!data.contents) {
+                    console.error('❌ API\'den veri gelmedi:', data);
+                    return toplamOyunlar;
+                }
+
+                const gamesData = JSON.parse(data.contents);
+                const results = gamesData.results || [];
+
+                if (results.length === 0) {
                     console.log('📦 Tüm oyunlar yüklendi! Toplam:', toplamOyunlar.length);
                     return toplamOyunlar;
                 }
 
-                const yeniOyunlar = data.results.map(game => ({
+                const yeniOyunlar = results.map(game => ({
                     id: game.id,
                     isim: game.name,
                     tur: game.genres?.map(g => g.name).join(', ') || 'Bilinmiyor',
@@ -530,11 +535,13 @@
 
                 const hepsi = [...toplamOyunlar, ...yeniOyunlar];
 
+                // 500 oyuna ulaştıysak dur
                 if (hepsi.length >= 500) {
                     console.log('📦 500 oyuna ulaşıldı, durduruluyor.');
                     return hepsi;
                 }
 
+                // Sonraki sayfayı getir (biraz bekle)
                 await new Promise(resolve => setTimeout(resolve, 300));
                 return oyunlariGetir(sayfa + 1, hepsi);
 
@@ -585,7 +592,7 @@
             yenileBtn.innerHTML =
                 `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Yükleniyor...`;
 
-            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Son 10 yılın en iyi oyunları yükleniyor (500 oyuna kadar)...</p>';
+            sonucDiv.innerHTML = '<p class="yukleniyor">🔄 Oyunlar yükleniyor (500 oyuna kadar)...</p>';
 
             try {
                 tumOyunlar = await oyunlariGetir(1, []);
@@ -602,7 +609,7 @@
                 sonucDiv.innerHTML = '<p class="hata-mesaji">❌ API\'den oyun gelmedi! Anahtarını kontrol et.</p>';
             } else {
                 sonucDiv.innerHTML =
-                    `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi! (Son 10 yıl, Metacritic 70+)</p>`;
+                    `<p class="basari-mesaji">✅ ${tumOyunlar.length} oyun yüklendi!</p>`;
                 console.log('📦 Yüklenen toplam oyun:', tumOyunlar.length);
             }
 
@@ -823,9 +830,6 @@
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const loginBtn = document.getElementById('loginBtn');
-        // Çıkış butonunu göster
-const cikisBtn = document.getElementById('cikisBtn');
-if (cikisBtn) cikisBtn.style.display = 'inline-flex';
         const registerBtn = document.getElementById('registerBtn');
         const showRegister = document.getElementById('showRegister');
         const showLogin = document.getElementById('showLogin');
@@ -869,10 +873,9 @@ if (cikisBtn) cikisBtn.style.display = 'inline-flex';
                 kullaniciId = data.user.id;
                 localStorage.setItem('kullaniciId', kullaniciId);
                 if (authContainer) authContainer.style.display = 'none';
-                // Çıkış butonunu göster
-const cikisBtn = document.getElementById('cikisBtn');
-if (cikisBtn) cikisBtn.style.display = 'inline-flex';
                 document.body.style.overflow = 'auto';
+                const cikisBtn = document.getElementById('cikisBtn');
+                if (cikisBtn) cikisBtn.style.display = 'inline-flex';
                 oyunlariYenile();
                 oynananListesiniGuncelle();
             });
@@ -927,56 +930,46 @@ if (cikisBtn) cikisBtn.style.display = 'inline-flex';
                 localStorage.setItem('kullaniciId', kullaniciId);
                 authContainer.style.display = 'none';
                 document.body.style.overflow = 'auto';
+                const cikisBtn = document.getElementById('cikisBtn');
+                if (cikisBtn) cikisBtn.style.display = 'inline-flex';
                 oyunlariYenile();
                 oynananListesiniGuncelle();
             } else {
                 console.log('❌ Oturum yok, giriş yapılması gerekiyor.');
                 authContainer.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
+                const cikisBtn = document.getElementById('cikisBtn');
+                if (cikisBtn) cikisBtn.style.display = 'none';
             }
         }
 
         // ============================================================
-// 🚪 ÇIKIŞ YAP
-// ============================================================
-async function cikisYap() {
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
-        alert('❌ Çıkış yaparken hata oluştu: ' + error.message);
-        return;
-    }
-    
-    // Kullanıcı bilgilerini temizle
-    localStorage.removeItem('kullaniciId');
-    kullaniciId = 'guest';
-    
-    // Giriş ekranını göster
-    const authContainer = document.getElementById('authContainer');
-    if (authContainer) {
-        authContainer.style.display = 'flex';
-    }
-    
-    // Ana sayfayı temizle
-    document.getElementById('sonuc').innerHTML = '<p>Çıkış yaptınız. Tekrar giriş yapmak için sayfayı yenileyin.</p>';
-    document.getElementById('oynananListesi').innerHTML = '<span style="color:#888;">Çıkış yaptınız.</span>';
-    
-    console.log('✅ Çıkış yapıldı.');
-}
+        // 9️⃣ ÇIKIŞ YAP
+        // ============================================================
+        async function cikisYap() {
+            const { error } = await supabase.auth.signOut();
+
+            if (error) {
+                alert('❌ Çıkış yaparken hata oluştu: ' + error.message);
+                return;
+            }
+
+            localStorage.removeItem('kullaniciId');
+            kullaniciId = 'guest';
+            if (authContainer) authContainer.style.display = 'flex';
+            document.getElementById('sonuc').innerHTML = '<p>Çıkış yaptınız. Tekrar giriş yapmak için sayfayı yenileyin.</p>';
+            document.getElementById('oynananListesi').innerHTML = '<span style="color:#888;">Çıkış yaptınız.</span>';
+            const cikisBtn = document.getElementById('cikisBtn');
+            if (cikisBtn) cikisBtn.style.display = 'none';
+            console.log('✅ Çıkış yapıldı.');
+        }
 
         // ============================================================
-        // 9️⃣ SAYFA YÜKLENİNCE
+        // 🔟 SAYFA YÜKLENİNCE
         // ============================================================
         window.onload = function() {
             console.log('🚀 Sayfa yüklendi!');
 
-            // Çıkış butonu
-const cikisBtn = document.getElementById('cikisBtn');
-if (cikisBtn) {
-    cikisBtn.addEventListener('click', cikisYap);
-}
-
-            // Modal dışı tıklama
             const modal = document.getElementById('oyunModal');
             if (modal) {
                 modal.addEventListener('click', function(e) {
@@ -984,7 +977,6 @@ if (cikisBtn) {
                 });
             }
 
-            // ESC tuşu ile kapat
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') modalKapat();
             });
@@ -1005,6 +997,11 @@ if (cikisBtn) {
                 yenileBtn.addEventListener('click', oyunlariYenile);
             }
 
+            const cikisBtn = document.getElementById('cikisBtn');
+            if (cikisBtn) {
+                cikisBtn.addEventListener('click', cikisYap);
+            }
+
             document.querySelectorAll('.filtre-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     filtrele(this.dataset.tur);
@@ -1013,7 +1010,7 @@ if (cikisBtn) {
         };
 
         // ============================================================
-        // 🔟 GLOBAL FONKSİYONLAR
+        // 1️⃣1️⃣ GLOBAL FONKSİYONLAR
         // ============================================================
         window.rastgeleOner = rastgeleOner;
         window.filtrele = filtrele;
@@ -1021,6 +1018,7 @@ if (cikisBtn) {
         window.oyunlariYenile = oyunlariYenile;
         window.modalAc = modalAc;
         window.modalKapat = modalKapat;
+        window.cikisYap = cikisYap;
     </script>
 
 </body>
